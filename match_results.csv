@@ -1,0 +1,381 @@
+date,home_team,away_team,home_score,away_score,league,season
+8/5/22,Crystal Palace,Arsenal,0,2,premierleague,2022
+8/6/22,Fulham,Liverpool,2,2,premierleague,2022
+N/A,Tottenham,Southampton,4,1,premierleague,2022
+N/A,Newcastle,Nottm Forest,2,0,premierleague,2022
+N/A,Leeds,Wolves,2,1,premierleague,2022
+N/A,Bournemouth,Aston Villa,2,0,premierleague,2022
+N/A,Everton,Chelsea,0,1,premierleague,2022
+8/7/22,Leicester,Brentford,2,2,premierleague,2022
+N/A,Man Utd,Brighton,1,2,premierleague,2022
+N/A,West Ham,Man City,0,2,premierleague,2022
+8/13/22,Aston Villa,Everton,2,1,premierleague,2022
+N/A,Wolves,Fulham,0,0,premierleague,2022
+N/A,Southampton,Leeds,2,2,premierleague,2022
+N/A,Man City,Bournemouth,4,0,premierleague,2022
+N/A,Brighton,Newcastle,0,0,premierleague,2022
+N/A,Arsenal,Leicester,4,2,premierleague,2022
+N/A,Brentford,Man Utd,4,0,premierleague,2022
+8/14/22,Nottm Forest,West Ham,1,0,premierleague,2022
+N/A,Chelsea,Tottenham,2,2,premierleague,2022
+8/15/22,Liverpool,Crystal Palace,1,1,premierleague,2022
+8/20/22,Tottenham,Wolves,1,0,premierleague,2022
+N/A,Crystal Palace,Aston Villa,3,1,premierleague,2022
+N/A,Everton,Nottm Forest,1,1,premierleague,2022
+N/A,Fulham,Brentford,3,2,premierleague,2022
+N/A,Leicester,Southampton,1,2,premierleague,2022
+N/A,Bournemouth,Arsenal,0,3,premierleague,2022
+8/21/22,Leeds,Chelsea,3,0,premierleague,2022
+N/A,West Ham,Brighton,0,2,premierleague,2022
+N/A,Newcastle,Man City,3,3,premierleague,2022
+8/22/22,Man Utd,Liverpool,2,1,premierleague,2022
+8/27/22,Southampton,Man Utd,0,1,premierleague,2022
+N/A,Brentford,Everton,1,1,premierleague,2022
+N/A,Brighton,Leeds,1,0,premierleague,2022
+N/A,Chelsea,Leicester,2,1,premierleague,2022
+N/A,Liverpool,Bournemouth,9,0,premierleague,2022
+N/A,Man City,Crystal Palace,4,2,premierleague,2022
+N/A,Arsenal,Fulham,2,1,premierleague,2022
+8/28/22,Aston Villa,West Ham,0,1,premierleague,2022
+N/A,Wolves,Newcastle,1,1,premierleague,2022
+N/A,Nottm Forest,Tottenham,0,2,premierleague,2022
+8/30/22,Fulham,Brighton,2,1,premierleague,2022
+N/A,Crystal Palace,Brentford,1,1,premierleague,2022
+N/A,Southampton,Chelsea,2,1,premierleague,2022
+N/A,Leeds,Everton,1,1,premierleague,2022
+8/31/22,Bournemouth,Wolves,0,0,premierleague,2022
+N/A,Arsenal,Aston Villa,2,1,premierleague,2022
+N/A,Man City,Nottm Forest,6,0,premierleague,2022
+N/A,West Ham,Tottenham,1,1,premierleague,2022
+N/A,Liverpool,Newcastle,2,1,premierleague,2022
+9/1/22,Leicester,Man Utd,0,1,premierleague,2022
+9/3/22,Everton,Liverpool,0,0,premierleague,2022
+N/A,Brentford,Leeds,5,2,premierleague,2022
+N/A,Chelsea,West Ham,2,1,premierleague,2022
+N/A,Newcastle,Crystal Palace,0,0,premierleague,2022
+N/A,Nottm Forest,Bournemouth,2,3,premierleague,2022
+N/A,Tottenham,Fulham,2,1,premierleague,2022
+N/A,Wolves,Southampton,1,0,premierleague,2022
+N/A,Aston Villa,Man City,1,1,premierleague,2022
+9/4/22,Brighton,Leicester,5,2,premierleague,2022
+N/A,Man Utd,Arsenal,3,1,premierleague,2022
+1/12/23,Fulham,Chelsea,2,1,premierleague,2022
+1/18/23,Crystal Palace,Man Utd,1,1,premierleague,2022
+1/19/23,Man City,Tottenham,4,2,premierleague,2022
+3/1/23,Arsenal,Everton,4,0,premierleague,2022
+N/A,Liverpool,Wolves,2,0,premierleague,2022
+3/15/23,Southampton,Brentford,0,2,premierleague,2022
+4/4/23,Bournemouth,Brighton,0,2,premierleague,2022
+N/A,Leeds,Nottm Forest,2,1,premierleague,2022
+N/A,Leicester,Aston Villa,1,2,premierleague,2022
+4/5/23,West Ham,Newcastle,1,5,premierleague,2022
+9/16/22,Aston Villa,Southampton,1,0,premierleague,2022
+N/A,Nottm Forest,Fulham,2,3,premierleague,2022
+9/17/22,Wolves,Man City,0,3,premierleague,2022
+N/A,Newcastle,Bournemouth,1,1,premierleague,2022
+N/A,Tottenham,Leicester,6,2,premierleague,2022
+9/18/22,Brentford,Arsenal,0,3,premierleague,2022
+N/A,Everton,West Ham,1,0,premierleague,2022
+2/8/23,Man Utd,Leeds,2,2,premierleague,2022
+3/15/23,Brighton,Crystal Palace,1,0,premierleague,2022
+4/4/23,Chelsea,Liverpool,0,0,premierleague,2022
+10/1/22,Arsenal,Tottenham,3,1,premierleague,2022
+N/A,Bournemouth,Brentford,0,0,premierleague,2022
+N/A,Crystal Palace,Chelsea,1,2,premierleague,2022
+N/A,Fulham,Newcastle,1,4,premierleague,2022
+N/A,Liverpool,Brighton,3,3,premierleague,2022
+N/A,Southampton,Everton,1,2,premierleague,2022
+N/A,West Ham,Wolves,2,0,premierleague,2022
+10/2/22,Man City,Man Utd,6,3,premierleague,2022
+N/A,Leeds,Aston Villa,0,0,premierleague,2022
+10/3/22,Leicester,Nottm Forest,4,0,premierleague,2022
+10/8/22,Bournemouth,Leicester,2,1,premierleague,2022
+N/A,Chelsea,Wolves,3,0,premierleague,2022
+N/A,Man City,Southampton,4,0,premierleague,2022
+N/A,Newcastle,Brentford,5,1,premierleague,2022
+N/A,Brighton,Tottenham,0,1,premierleague,2022
+10/9/22,Crystal Palace,Leeds,2,1,premierleague,2022
+N/A,West Ham,Fulham,3,1,premierleague,2022
+N/A,Arsenal,Liverpool,3,2,premierleague,2022
+N/A,Everton,Man Utd,1,2,premierleague,2022
+10/10/22,Nottm Forest,Aston Villa,1,1,premierleague,2022
+10/14/22,Brentford,Brighton,2,0,premierleague,2022
+10/15/22,Leicester,Crystal Palace,0,0,premierleague,2022
+N/A,Fulham,Bournemouth,2,2,premierleague,2022
+N/A,Wolves,Nottm Forest,1,0,premierleague,2022
+N/A,Tottenham,Everton,2,0,premierleague,2022
+10/16/22,Aston Villa,Chelsea,0,2,premierleague,2022
+N/A,Leeds,Arsenal,0,1,premierleague,2022
+N/A,Man Utd,Newcastle,0,0,premierleague,2022
+N/A,Southampton,West Ham,1,1,premierleague,2022
+N/A,Liverpool,Man City,1,0,premierleague,2022
+10/18/22,Brighton,Nottm Forest,0,0,premierleague,2022
+N/A,Crystal Palace,Wolves,2,1,premierleague,2022
+10/19/22,Bournemouth,Southampton,0,1,premierleague,2022
+N/A,Brentford,Chelsea,0,0,premierleague,2022
+N/A,Newcastle,Everton,1,0,premierleague,2022
+N/A,Liverpool,West Ham,1,0,premierleague,2022
+N/A,Man Utd,Tottenham,2,0,premierleague,2022
+10/20/22,Fulham,Aston Villa,3,0,premierleague,2022
+N/A,Leicester,Leeds,2,0,premierleague,2022
+2/15/23,Arsenal,Man City,1,3,premierleague,2022
+10/22/22,Nottm Forest,Liverpool,1,0,premierleague,2022
+N/A,Everton,Crystal Palace,3,0,premierleague,2022
+N/A,Man City,Brighton,3,1,premierleague,2022
+N/A,Chelsea,Man Utd,1,1,premierleague,2022
+10/23/22,Aston Villa,Brentford,4,0,premierleague,2022
+N/A,Leeds,Fulham,2,3,premierleague,2022
+N/A,Southampton,Arsenal,1,1,premierleague,2022
+N/A,Wolves,Leicester,0,4,premierleague,2022
+N/A,Tottenham,Newcastle,1,2,premierleague,2022
+10/24/22,West Ham,Bournemouth,2,0,premierleague,2022
+10/29/22,Leicester,Man City,0,1,premierleague,2022
+N/A,Bournemouth,Tottenham,2,3,premierleague,2022
+N/A,Brentford,Wolves,1,1,premierleague,2022
+N/A,Brighton,Chelsea,4,1,premierleague,2022
+N/A,Crystal Palace,Southampton,1,0,premierleague,2022
+N/A,Newcastle,Aston Villa,4,0,premierleague,2022
+N/A,Fulham,Everton,0,0,premierleague,2022
+N/A,Liverpool,Leeds,1,2,premierleague,2022
+10/30/22,Arsenal,Nottm Forest,5,0,premierleague,2022
+N/A,Man Utd,West Ham,1,0,premierleague,2022
+11/5/22,Leeds,Bournemouth,4,3,premierleague,2022
+N/A,Man City,Fulham,2,1,premierleague,2022
+N/A,Nottm Forest,Brentford,2,2,premierleague,2022
+N/A,Wolves,Brighton,2,3,premierleague,2022
+N/A,Everton,Leicester,0,2,premierleague,2022
+11/6/22,Chelsea,Arsenal,0,1,premierleague,2022
+N/A,Aston Villa,Man Utd,3,1,premierleague,2022
+N/A,Southampton,Newcastle,1,4,premierleague,2022
+N/A,West Ham,Crystal Palace,1,2,premierleague,2022
+N/A,Tottenham,Liverpool,1,2,premierleague,2022
+11/12/22,Man City,Brentford,1,2,premierleague,2022
+N/A,Bournemouth,Everton,3,0,premierleague,2022
+N/A,Liverpool,Southampton,3,1,premierleague,2022
+N/A,Nottm Forest,Crystal Palace,1,0,premierleague,2022
+N/A,Tottenham,Leeds,4,3,premierleague,2022
+N/A,West Ham,Leicester,0,2,premierleague,2022
+N/A,Newcastle,Chelsea,1,0,premierleague,2022
+N/A,Wolves,Arsenal,0,2,premierleague,2022
+11/13/22,Brighton,Aston Villa,1,2,premierleague,2022
+N/A,Fulham,Man Utd,1,2,premierleague,2022
+12/26/22,Brentford,Tottenham,2,2,premierleague,2022
+N/A,Crystal Palace,Fulham,0,3,premierleague,2022
+N/A,Everton,Wolves,1,2,premierleague,2022
+N/A,Leicester,Newcastle,0,3,premierleague,2022
+N/A,Southampton,Brighton,1,3,premierleague,2022
+N/A,Aston Villa,Liverpool,1,3,premierleague,2022
+N/A,Arsenal,West Ham,3,1,premierleague,2022
+12/27/22,Chelsea,Bournemouth,2,0,premierleague,2022
+N/A,Man Utd,Nottm Forest,3,0,premierleague,2022
+12/28/22,Leeds,Man City,1,3,premierleague,2022
+12/30/22,West Ham,Brentford,0,2,premierleague,2022
+N/A,Liverpool,Leicester,2,1,premierleague,2022
+12/31/22,Wolves,Man Utd,0,1,premierleague,2022
+N/A,Bournemouth,Crystal Palace,0,2,premierleague,2022
+N/A,Fulham,Southampton,2,1,premierleague,2022
+N/A,Man City,Everton,1,1,premierleague,2022
+N/A,Newcastle,Leeds,0,0,premierleague,2022
+N/A,Brighton,Arsenal,2,4,premierleague,2022
+1/1/23,Tottenham,Aston Villa,0,2,premierleague,2022
+N/A,Nottm Forest,Chelsea,1,1,premierleague,2022
+1/2/23,Brentford,Liverpool,3,1,premierleague,2022
+1/3/23,Arsenal,Newcastle,0,0,premierleague,2022
+N/A,Everton,Brighton,1,4,premierleague,2022
+N/A,Leicester,Fulham,0,1,premierleague,2022
+N/A,Man Utd,Bournemouth,3,0,premierleague,2022
+1/4/23,Southampton,Nottm Forest,0,1,premierleague,2022
+N/A,Leeds,West Ham,2,2,premierleague,2022
+N/A,Aston Villa,Wolves,1,1,premierleague,2022
+N/A,Crystal Palace,Tottenham,0,4,premierleague,2022
+1/5/23,Chelsea,Man City,0,1,premierleague,2022
+1/13/23,Aston Villa,Leeds,2,1,premierleague,2022
+1/14/23,Man Utd,Man City,2,1,premierleague,2022
+N/A,Brighton,Liverpool,3,0,premierleague,2022
+N/A,Wolves,West Ham,1,0,premierleague,2022
+N/A,Nottm Forest,Leicester,2,0,premierleague,2022
+N/A,Everton,Southampton,1,2,premierleague,2022
+N/A,Brentford,Bournemouth,2,0,premierleague,2022
+1/15/23,Chelsea,Crystal Palace,1,0,premierleague,2022
+N/A,Newcastle,Fulham,1,0,premierleague,2022
+N/A,Tottenham,Arsenal,0,2,premierleague,2022
+1/21/23,Liverpool,Chelsea,0,0,premierleague,2022
+N/A,Bournemouth,Nottm Forest,1,1,premierleague,2022
+N/A,West Ham,Everton,2,0,premierleague,2022
+N/A,Southampton,Aston Villa,0,1,premierleague,2022
+N/A,Leicester,Brighton,2,2,premierleague,2022
+N/A,Crystal Palace,Newcastle,0,0,premierleague,2022
+1/22/23,Man City,Wolves,3,0,premierleague,2022
+N/A,Leeds,Brentford,0,0,premierleague,2022
+N/A,Arsenal,Man Utd,3,2,premierleague,2022
+1/23/23,Fulham,Tottenham,0,1,premierleague,2022
+2/3/23,Chelsea,Fulham,0,0,premierleague,2022
+2/4/23,Everton,Arsenal,1,0,premierleague,2022
+N/A,Aston Villa,Leicester,2,4,premierleague,2022
+N/A,Brentford,Southampton,3,0,premierleague,2022
+N/A,Brighton,Bournemouth,1,0,premierleague,2022
+N/A,Man Utd,Crystal Palace,2,1,premierleague,2022
+N/A,Wolves,Liverpool,3,0,premierleague,2022
+N/A,Newcastle,West Ham,1,1,premierleague,2022
+2/5/23,Nottm Forest,Leeds,1,0,premierleague,2022
+N/A,Tottenham,Man City,1,0,premierleague,2022
+2/11/23,West Ham,Chelsea,1,1,premierleague,2022
+N/A,Southampton,Wolves,1,2,premierleague,2022
+N/A,Leicester,Tottenham,4,1,premierleague,2022
+N/A,Arsenal,Brentford,1,1,premierleague,2022
+N/A,Crystal Palace,Brighton,1,1,premierleague,2022
+N/A,Fulham,Nottm Forest,2,0,premierleague,2022
+N/A,Bournemouth,Newcastle,1,1,premierleague,2022
+2/12/23,Leeds,Man Utd,0,2,premierleague,2022
+N/A,Man City,Aston Villa,3,1,premierleague,2022
+2/13/23,Liverpool,Everton,2,0,premierleague,2022
+2/18/23,Aston Villa,Arsenal,2,4,premierleague,2022
+N/A,Brentford,Crystal Palace,1,1,premierleague,2022
+N/A,Brighton,Fulham,0,1,premierleague,2022
+N/A,Chelsea,Southampton,0,1,premierleague,2022
+N/A,Everton,Leeds,1,0,premierleague,2022
+N/A,Wolves,Bournemouth,0,1,premierleague,2022
+N/A,Nottm Forest,Man City,1,1,premierleague,2022
+N/A,Newcastle,Liverpool,0,2,premierleague,2022
+2/19/23,Man Utd,Leicester,3,0,premierleague,2022
+N/A,Tottenham,West Ham,2,0,premierleague,2022
+2/24/23,Fulham,Wolves,1,1,premierleague,2022
+2/25/23,Everton,Aston Villa,0,2,premierleague,2022
+N/A,Leeds,Southampton,1,0,premierleague,2022
+N/A,Leicester,Arsenal,0,1,premierleague,2022
+N/A,West Ham,Nottm Forest,4,0,premierleague,2022
+N/A,Bournemouth,Man City,1,4,premierleague,2022
+N/A,Crystal Palace,Liverpool,0,0,premierleague,2022
+2/26/23,Tottenham,Chelsea,2,0,premierleague,2022
+4/5/23,Man Utd,Brentford,1,0,premierleague,2022
+5/18/23,Newcastle,Brighton,4,1,premierleague,2022
+3/4/23,Man City,Newcastle,2,0,premierleague,2022
+N/A,Wolves,Tottenham,1,0,premierleague,2022
+N/A,Chelsea,Leeds,1,0,premierleague,2022
+N/A,Brighton,West Ham,4,0,premierleague,2022
+N/A,Aston Villa,Crystal Palace,1,0,premierleague,2022
+N/A,Arsenal,Bournemouth,3,2,premierleague,2022
+N/A,Southampton,Leicester,1,0,premierleague,2022
+3/5/23,Nottm Forest,Everton,2,2,premierleague,2022
+N/A,Liverpool,Man Utd,7,0,premierleague,2022
+3/6/23,Brentford,Fulham,3,2,premierleague,2022
+3/11/23,Bournemouth,Liverpool,1,0,premierleague,2022
+N/A,Everton,Brentford,1,0,premierleague,2022
+N/A,Leeds,Brighton,2,2,premierleague,2022
+N/A,Tottenham,Nottm Forest,3,1,premierleague,2022
+N/A,Leicester,Chelsea,1,3,premierleague,2022
+N/A,Crystal Palace,Man City,0,1,premierleague,2022
+3/12/23,Fulham,Arsenal,0,3,premierleague,2022
+N/A,West Ham,Aston Villa,1,1,premierleague,2022
+N/A,Man Utd,Southampton,0,0,premierleague,2022
+N/A,Newcastle,Wolves,2,1,premierleague,2022
+3/17/23,Nottm Forest,Newcastle,1,2,premierleague,2022
+3/18/23,Aston Villa,Bournemouth,3,0,premierleague,2022
+N/A,Brentford,Leicester,1,1,premierleague,2022
+N/A,Southampton,Tottenham,3,3,premierleague,2022
+N/A,Wolves,Leeds,2,4,premierleague,2022
+N/A,Chelsea,Everton,2,2,premierleague,2022
+3/19/23,Arsenal,Crystal Palace,4,1,premierleague,2022
+5/3/23,Liverpool,Fulham,1,0,premierleague,2022
+N/A,Man City,West Ham,3,0,premierleague,2022
+5/4/23,Brighton,Man Utd,1,0,premierleague,2022
+4/1/23,Man City,Liverpool,4,1,premierleague,2022
+N/A,Nottm Forest,Wolves,1,1,premierleague,2022
+N/A,Crystal Palace,Leicester,2,1,premierleague,2022
+N/A,Brighton,Brentford,3,3,premierleague,2022
+N/A,Bournemouth,Fulham,2,1,premierleague,2022
+N/A,Arsenal,Leeds,4,1,premierleague,2022
+N/A,Chelsea,Aston Villa,0,2,premierleague,2022
+4/2/23,West Ham,Southampton,1,0,premierleague,2022
+N/A,Newcastle,Man Utd,2,0,premierleague,2022
+4/3/23,Everton,Tottenham,1,1,premierleague,2022
+4/8/23,Man Utd,Everton,2,0,premierleague,2022
+N/A,Wolves,Chelsea,1,0,premierleague,2022
+N/A,Tottenham,Brighton,2,1,premierleague,2022
+N/A,Leicester,Bournemouth,0,1,premierleague,2022
+N/A,Fulham,West Ham,0,1,premierleague,2022
+N/A,Brentford,Newcastle,1,2,premierleague,2022
+N/A,Aston Villa,Nottm Forest,2,0,premierleague,2022
+N/A,Southampton,Man City,1,4,premierleague,2022
+4/9/23,Leeds,Crystal Palace,1,5,premierleague,2022
+N/A,Liverpool,Arsenal,2,2,premierleague,2022
+4/15/23,Aston Villa,Newcastle,3,0,premierleague,2022
+N/A,Wolves,Brentford,2,0,premierleague,2022
+N/A,Tottenham,Bournemouth,2,3,premierleague,2022
+N/A,Southampton,Crystal Palace,0,2,premierleague,2022
+N/A,Everton,Fulham,1,3,premierleague,2022
+N/A,Chelsea,Brighton,1,2,premierleague,2022
+N/A,Man City,Leicester,3,1,premierleague,2022
+4/16/23,West Ham,Arsenal,2,2,premierleague,2022
+N/A,Nottm Forest,Man Utd,0,2,premierleague,2022
+4/17/23,Leeds,Liverpool,1,6,premierleague,2022
+4/21/23,Arsenal,Southampton,3,3,premierleague,2022
+4/22/23,Fulham,Leeds,2,1,premierleague,2022
+N/A,Liverpool,Nottm Forest,3,2,premierleague,2022
+N/A,Leicester,Wolves,2,1,premierleague,2022
+N/A,Crystal Palace,Everton,0,0,premierleague,2022
+N/A,Brentford,Aston Villa,1,1,premierleague,2022
+4/23/23,Newcastle,Tottenham,6,1,premierleague,2022
+N/A,Bournemouth,West Ham,0,4,premierleague,2022
+5/24/23,Brighton,Man City,1,1,premierleague,2022
+5/25/23,Man Utd,Chelsea,4,1,premierleague,2022
+4/25/23,Wolves,Crystal Palace,2,0,premierleague,2022
+N/A,Aston Villa,Fulham,1,0,premierleague,2022
+N/A,Leeds,Leicester,1,1,premierleague,2022
+4/26/23,Nottm Forest,Brighton,3,1,premierleague,2022
+N/A,Chelsea,Brentford,0,2,premierleague,2022
+N/A,West Ham,Liverpool,1,2,premierleague,2022
+N/A,Man City,Arsenal,4,1,premierleague,2022
+4/27/23,Southampton,Bournemouth,0,1,premierleague,2022
+N/A,Everton,Newcastle,1,4,premierleague,2022
+N/A,Tottenham,Man Utd,2,2,premierleague,2022
+4/29/23,Crystal Palace,West Ham,4,3,premierleague,2022
+N/A,Brighton,Wolves,6,0,premierleague,2022
+N/A,Brentford,Nottm Forest,2,1,premierleague,2022
+4/30/23,Newcastle,Southampton,3,1,premierleague,2022
+N/A,Man Utd,Aston Villa,1,0,premierleague,2022
+N/A,Fulham,Man City,1,2,premierleague,2022
+N/A,Bournemouth,Leeds,4,1,premierleague,2022
+N/A,Liverpool,Tottenham,4,3,premierleague,2022
+5/1/23,Leicester,Everton,2,2,premierleague,2022
+5/2/23,Arsenal,Chelsea,3,1,premierleague,2022
+5/6/23,Bournemouth,Chelsea,1,3,premierleague,2022
+N/A,Man City,Leeds,2,1,premierleague,2022
+N/A,Wolves,Aston Villa,1,0,premierleague,2022
+N/A,Tottenham,Crystal Palace,1,0,premierleague,2022
+N/A,Liverpool,Brentford,1,0,premierleague,2022
+5/7/23,Newcastle,Arsenal,0,2,premierleague,2022
+N/A,West Ham,Man Utd,1,0,premierleague,2022
+5/8/23,Fulham,Leicester,5,3,premierleague,2022
+N/A,Brighton,Everton,1,5,premierleague,2022
+N/A,Nottm Forest,Southampton,4,3,premierleague,2022
+5/13/23,Leeds,Newcastle,2,2,premierleague,2022
+N/A,Aston Villa,Tottenham,2,1,premierleague,2022
+N/A,Chelsea,Nottm Forest,2,2,premierleague,2022
+N/A,Crystal Palace,Bournemouth,2,0,premierleague,2022
+N/A,Man Utd,Wolves,2,0,premierleague,2022
+N/A,Southampton,Fulham,0,2,premierleague,2022
+5/14/23,Brentford,West Ham,2,0,premierleague,2022
+N/A,Everton,Man City,0,3,premierleague,2022
+N/A,Arsenal,Brighton,0,3,premierleague,2022
+5/15/23,Leicester,Liverpool,0,3,premierleague,2022
+5/20/23,Tottenham,Brentford,1,3,premierleague,2022
+N/A,Bournemouth,Man Utd,0,1,premierleague,2022
+N/A,Fulham,Crystal Palace,2,2,premierleague,2022
+N/A,Liverpool,Aston Villa,1,1,premierleague,2022
+N/A,Wolves,Everton,1,1,premierleague,2022
+N/A,Nottm Forest,Arsenal,1,0,premierleague,2022
+5/21/23,West Ham,Leeds,3,1,premierleague,2022
+N/A,Brighton,Southampton,3,1,premierleague,2022
+N/A,Man City,Chelsea,1,0,premierleague,2022
+5/22/23,Newcastle,Leicester,0,0,premierleague,2022
+5/28/23,Arsenal,Wolves,5,0,premierleague,2022
+N/A,Aston Villa,Brighton,2,1,premierleague,2022
+N/A,Brentford,Man City,1,0,premierleague,2022
+N/A,Chelsea,Newcastle,1,1,premierleague,2022
+N/A,Crystal Palace,Nottm Forest,1,1,premierleague,2022
+N/A,Everton,Bournemouth,1,0,premierleague,2022
+N/A,Leeds,Tottenham,1,4,premierleague,2022
+N/A,Leicester,West Ham,2,1,premierleague,2022
+N/A,Man Utd,Fulham,2,1,premierleague,2022
+N/A,Southampton,Liverpool,4,4,premierleague,2022
