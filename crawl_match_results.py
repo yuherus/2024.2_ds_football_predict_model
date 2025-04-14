@@ -4,7 +4,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 
 def setup_driver():
     chrome_options = Options()
@@ -12,8 +11,7 @@ def setup_driver():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--headless")  # Nếu không muốn mở trình duyệt
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
     return driver
 
 def crawl_fbref_match_results(league="Premier League", season=2022):
@@ -30,7 +28,8 @@ def crawl_fbref_match_results(league="Premier League", season=2022):
         for row in rows:
             try:
                 # Một số dòng là separator nên bỏ qua
-                if row.get_attribute("class") == "thead":
+                is_separator = row.get_attribute("class") == "thead"
+                if is_separator:
                     continue
 
                 date = row.find_element(By.CSS_SELECTOR, "td[data-stat='date']").text
@@ -38,7 +37,7 @@ def crawl_fbref_match_results(league="Premier League", season=2022):
                 away_team = row.find_element(By.CSS_SELECTOR, "td[data-stat='away_team']").text
                 score = row.find_element(By.CSS_SELECTOR, "td[data-stat='score']").text
 
-                if score and "-" in score:
+                if score and "–" in score:
                     home_score, away_score = map(int, score.split("–"))
 
                     match_data = {
