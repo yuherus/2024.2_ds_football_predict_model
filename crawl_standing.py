@@ -59,21 +59,22 @@ def crawl_standings(driver, league, season):
                 losses = cols[3].text.strip()
 
                 goals = cols[4].text.strip()
-                goals_scored, goals_against = map(int, goals.split(":"))
-
-                points = cols[5].text.strip()
+                goals_for, goals_against = map(int, goals.split(":"))
+                goals_diff = cols[5].text.strip()
+                points = cols[6].text.strip()
 
                 data = {
-                    "Club": club,
-                    "Matches Played": matches_played,
-                    "Wins": wins,
-                    "Draws": draws,
-                    "Losses": losses,
-                    "Goals Scored": goals_scored,
-                    "Goals Against": goals_against,
-                    "Pts": points,
-                    "League": league,
-                    "Season": season
+                    "club": club,
+                    "matches_played": matches_played,
+                    "wins": wins,
+                    "draws": draws,
+                    "losses": losses,
+                    "goals_for": goals_for,
+                    "goals_against": goals_against,
+                    "goals_diff": goals_diff,
+                    "points": points,
+                    "league": league,
+                    "season": season
                 }
                 print(f"{data}")
                 
@@ -89,7 +90,7 @@ def crawl_standings(driver, league, season):
 
 # Cấu hình giải đấu và mùa giải
 leagues = ["premierleague", "bundesliga", "laliga", "seriea", "ligue1"]
-seasons = list(range(1992, 2025))
+seasons = list(range(2014, 2025))
 # leagues = ["premierleague"]
 # seasons = [2022, 2023]
 
