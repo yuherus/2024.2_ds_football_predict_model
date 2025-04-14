@@ -7,29 +7,26 @@ from selenium.webdriver.common.by import By
 
 def setup_driver():
     chrome_options = Options()
-    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--headless")  # Nếu không muốn mở trình duyệt
-    driver = webdriver.Chrome(options=chrome_options)
-    return driver
+    chrome_options.add_argument("--headless")
+    return webdriver.Chrome(options=chrome_options)
 
-def crawl_fbref_match_results(league="Premier League", season=2022):
-    print(f"Crawling FBref data for {league} - {season} season...")
+def crawl_fbref_match_results(league_name, league_id, league_slug, season):
+    print(f"\n Crawling {league_name} - {season}-{season+1}...")
     driver = setup_driver()
     results = []
 
     try:
-        url = f"https://fbref.com/en/comps/9/{season}-{season+1}/schedule/{season}-{season+1}-Premier-League-Scores-and-Fixtures"
+        url = f"https://fbref.com/en/comps/{league_id}/{season}-{season+1}/schedule/{season}-{season+1}-{league_slug}-Scores-and-Fixtures"
         driver.get(url)
         time.sleep(5)
 
         rows = driver.find_elements(By.CSS_SELECTOR, "table.stats_table tbody tr")
         for row in rows:
             try:
-                # Một số dòng là separator nên bỏ qua
-                is_separator = row.get_attribute("class") == "thead"
-                if is_separator:
+                if row.get_attribute("class") == "thead":
                     continue
 
                 date = row.find_element(By.CSS_SELECTOR, "td[data-stat='date']").text
@@ -39,33 +36,50 @@ def crawl_fbref_match_results(league="Premier League", season=2022):
 
                 if score and "–" in score:
                     home_score, away_score = map(int, score.split("–"))
-
                     match_data = {
                         "date": date,
                         "home_team": home_team,
                         "away_team": away_team,
                         "home_score": home_score,
                         "away_score": away_score,
-                        "league": "premierleague",
-                        "season": season,
+                        "league": league_name.lower().replace(" ", ""),
+                        "season": f"{season}-{season+1}",
                         "source": "FBref"
                     }
-
                     results.append(match_data)
                     print(f"✔ {home_team} {home_score}-{away_score} {away_team}")
             except Exception as e:
                 print("⚠ Bỏ qua 1 dòng bị lỗi:", e)
-                continue
     except Exception as e:
-        print(f"❌ Lỗi khi crawl FBref: {e}")
+        print(f"Lỗi khi crawl {league_name} {season}-{season+1}: {e}")
     finally:
         driver.quit()
 
     return results
 
-# Crawl dữ liệu và lưu vào CSV
-season = 2022
-matches = crawl_fbref_match_results(season=season)
-df = pd.DataFrame(matches)
+# Cấu hình giải đấu
+leagues = [
+    {"name": "Premier League", "id": 9, "slug": "Premier-League"},
+    {"name": "La Liga", "id": 12, "slug": "La-Liga"},
+    {"name": "Serie A", "id": 11, "slug": "Serie-A"},
+    {"name": "Bundesliga", "id": 20, "slug": "Bundesliga"},
+    {"name": "Ligue 1", "id": 13, "slug": "Ligue-1"},
+]
+
+all_matches = []
+
+# Vòng lặp qua tất cả giải và mùa
+for league in leagues:
+    for season in range(2014, 2023 + 1):  # Từ mùa 2014–2015 đến 2022–2023
+        matches = crawl_fbref_match_results(
+            league_name=league["name"],
+            league_id=league["id"],
+            league_slug=league["slug"],
+            season=season
+        )
+        all_matches.extend(matches)
+
+# Lưu toàn bộ dữ liệu
+df = pd.DataFrame(all_matches)
 df.to_csv("match_results_fbref.csv", index=False)
-print(f"\n✅ Đã lưu {len(df)} trận vào match_results_fbref.csv")
+print(f"\nĐã lưu {len(df)} trận đấu từ 5 giải vào match_results_fbref.csv")
