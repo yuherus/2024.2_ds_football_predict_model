@@ -6,6 +6,9 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
 
 
 def setup_driver():
@@ -35,12 +38,166 @@ def setup_driver():
     return driver
 
 
-def crawl_player_values(league, season):
-    """Crawl giá trị cầu thủ từ Transfermarkt using the marktwerte (market values) page."""
-    print(f"Crawling player values for {league} season {season}...")
-    driver = setup_driver()
-    player_values = []
+def crawl_team_with_requests(team_url):
+    """Crawl team data using requests and BeautifulSoup"""
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept': 'text/html,application/xhtml+xml,application/xml',
+        'Referer': 'https://www.transfermarkt.com/'
+    }
 
+    print(f"Fetching {team_url}")
+    response = requests.get(team_url, headers=headers)
+    if response.status_code != 200:
+        print(f"Failed to fetch {team_url}: {response.status_code}")
+        return []
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Extract team name
+    team_name = soup.select_one('h1.data-header__headline-wrapper')
+    if team_name:
+        team_name = team_name.text.strip()
+    else:
+        # Try alternate location
+        team_name_alt = soup.select_one('div.dataMain div.dataName')
+        team_name = team_name_alt.text.strip() if team_name_alt else "Unknown Team"
+
+    # Extract league and season
+    league_name = "Unknown"
+    league_elem = soup.select_one('div.data-header__club-info a')
+    if league_elem:
+        league_name = league_elem.text.strip()
+
+    season_text = "Unknown"
+    season_elem = soup.select_one('div.data-header__season-selector div.tm-tabs__option--active')
+    if season_elem:
+        season_text = season_elem.text.strip()
+    else:
+        # Extract season from URL
+        if 'saison_id' in team_url:
+            season_id = team_url.split('saison_id/')[1].split('/')[0].split('?')[0]
+            season_text = season_id
+
+    print(f"Processing team: {team_name} | League: {league_name} | Season: {season_text}")
+
+    player_values = []
+    player_rows = soup.select('table.items > tbody > tr.odd, table.items > tbody > tr.even')
+
+    print(f"Found {len(player_rows)} player rows")
+
+    for row in player_rows:
+        try:
+            # Jersey number
+            jersey_number = ""
+            number_elem = row.select_one('div.rn_nummer')
+            if number_elem:
+                jersey_number = number_elem.text.strip()
+
+            # Player name
+            player_elem = row.select_one('td.hauptlink a')
+            if not player_elem:
+                continue
+
+            player_name = player_elem.text.strip()
+            # Remove injury/suspension indicators
+            if '\xa0' in player_name:
+                player_name = player_name.split('\xa0')[0]
+
+            # Player URL for additional details if needed
+            player_url = player_elem.get('href', '')
+            if player_url and not player_url.startswith('http'):
+                player_url = f"https://www.transfermarkt.com{player_url}"
+
+            # Position
+            position_elem = row.select_one('table.inline-table tr:nth-child(2) td')
+            position = position_elem.text.strip() if position_elem else "Unknown"
+
+            # Age and date of birth
+            dob_age = "Unknown"
+            age = ""
+            dob_elem = row.select_one('td.zentriert:nth-of-type(3)')
+            if dob_elem:
+                dob_age = dob_elem.text.strip()
+                # Extract age from parentheses if present
+                if "(" in dob_age and ")" in dob_age:
+                    age = dob_age.split("(")[1].split(")")[0]
+
+            # Nationality - get all flags
+            nationality = "Unknown"
+            flag_elems = row.select('td.zentriert img.flaggenrahmen')
+            if flag_elems:
+                nationalities = []
+                for flag in flag_elems:
+                    nat = flag.get('title')
+                    if nat and nat not in nationalities:
+                        nationalities.append(nat)
+                nationality = " / ".join(nationalities) if nationalities else "Unknown"
+
+            # Market value
+            value_elem = row.select_one('td.rechts.hauptlink a')
+            market_value = value_elem.text.strip() if value_elem else "Unknown"
+
+            # Status (injured, suspended, etc.)
+            status = "Active"
+            status_elem = row.select_one('span[class*="verletzt"], span[class*="ausfall"]')
+            if status_elem and status_elem.get('title'):
+                status = status_elem.get('title')
+
+            # Check if player is on loan
+            on_loan = False
+            loan_from = ""
+            loan_elem = row.select_one('span.wechsel-kader-wappen')
+            if loan_elem and loan_elem.get('title') and "Joined from" in loan_elem.get('title'):
+                on_loan = True
+                loan_parts = loan_elem.get('title').split("Joined from ")
+                if len(loan_parts) > 1:
+                    loan_from = loan_parts[1].split(";")[0]
+
+            # Check if player is captain
+            is_captain = bool(row.select_one('span.kapitaenicon-table'))
+
+            player_data = {
+                'team': team_name,
+                'league': league_name,
+                'season': season_text,
+                'jersey_number': jersey_number,
+                'player_name': player_name,
+                'position': position,
+                'dob_age': dob_age,
+                'age': age,
+                'nationality': nationality,
+                'market_value': market_value,
+                'status': "Injured/Suspended" if status != "Active" else "Active",
+                'on_loan': on_loan,
+                'loan_from': loan_from,
+                'is_captain': is_captain
+            }
+
+            player_values.append(player_data)
+            print(
+                f"Added player: {player_name}, {position}, Age: {age}, Nationality: {nationality}, Value: {market_value}")
+
+        except Exception as e:
+            print(f"Error processing player: {e}")
+            traceback.print_exc()
+            continue
+
+    return player_values
+
+
+def crawl_league_team_values(league, season):
+    """
+    Crawl team values and squad information for a specific league and season.
+
+    Args:
+        league: League slug (e.g., "premierleague")
+        season: Season ID (e.g., 2024)
+
+    Returns:
+        List of dictionaries containing team data
+    """
     # Mapping leagues to their correct transfermarkt slugs and codes
     league_mapping = {
         "premierleague": {"slug": "premier-league", "code": "GB1", "name": "Premier League"},
@@ -51,175 +208,234 @@ def crawl_player_values(league, season):
     }
 
     try:
-        # Get league information
         league_info = league_mapping.get(league, {"slug": "premier-league", "code": "GB1", "name": "Premier League"})
         league_slug = league_info["slug"]
         league_code = league_info["code"]
-        league_name = league_info["name"]
 
-        # Use the direct market values page which has all players listed
-        base_url = f"https://www.transfermarkt.com/{league_slug}/marktwerte/wettbewerb/{league_code}/plus/1"
+        # URL to get league page
+        url = f"https://www.transfermarkt.com/{league_slug}/startseite/wettbewerb/{league_code}?saison_id={season}"
 
-        # Track pages processed
-        current_page = 1
-        has_next_page = True
+        # Use requests for the league page
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml',
+            'Referer': 'https://www.transfermarkt.com/'
+        }
 
-        while has_next_page and current_page <= 10:
-            # Construct URL with season parameter and pagination
-            if current_page == 1:
-                url = f"{base_url}?saison_id={season}"
-            else:
-                url = f"{base_url}/page/{current_page}?saison_id={season}"
+        print(f"Fetching league data for {league_info['name']} season {season}")
+        response = requests.get(url, headers=headers)
 
-            print(f"Processing page {current_page}: {url}")
-            driver.get(url)
+        if response.status_code != 200:
+            print(f"Failed to fetch league page: {response.status_code}")
+            return []
 
-            # Longer wait time to ensure page loads properly
-            time.sleep(10)
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-            # Save HTML for debugging the first page
-            if current_page == 1:
-                with open(f"{league}_{season}_debug_page.html", "w", encoding="utf-8") as f:
-                    f.write(driver.page_source)
+        # Find team data rows
+        team_rows = soup.select('table.items > tbody > tr')
+        print(f"Found {len(team_rows)} teams in {league_info['name']} season {season}")
 
-            # Direct JavaScript approach to extract data (more reliable)
-            player_data_script = """
-            const players = [];
-            const rows = document.querySelectorAll('table.items > tbody > tr.odd, table.items > tbody > tr.even');
+        team_values = []
 
-            rows.forEach(row => {
-                try {
-                    // Extract player name
-                    const playerNameElem = row.querySelector('td table.inline-table td.hauptlink a');
-                    const playerName = playerNameElem ? playerNameElem.textContent.trim() : "Unknown";
+        for row in team_rows:
+            try:
+                # Team name
+                team_name_elem = row.select_one('td.hauptlink a')
+                if not team_name_elem:
+                    continue
 
-                    // Extract position
-                    const positionElem = row.querySelector('td table.inline-table tr:nth-child(2) td');
-                    const position = positionElem ? positionElem.textContent.trim() : "Unknown";
+                team_name = team_name_elem.text.strip()
 
-                    // Extract nationality
-                    const flagElems = row.querySelectorAll('img.flaggenrahmen');
-                    const nationalities = [];
-                    flagElems.forEach(flag => {
-                        const nat = flag.getAttribute('title');
-                        if (nat && !nationalities.includes(nat)) {
-                            nationalities.push(nat);
-                        }
-                    });
-                    const nationality = nationalities.length > 0 ? nationalities.join(' / ') : "Unknown";
+                # Squad size
+                squad_size_elem = row.select_one('td:nth-of-type(3)')
+                squad_size = squad_size_elem.text.strip() if squad_size_elem else "Unknown"
 
-                    // Extract age
-                    const ageTds = Array.from(row.querySelectorAll('td.zentriert')).filter(td => 
-                        !td.querySelector('table') && !td.querySelector('a[href*="/verein/"]')
-                    );
-                    const age = ageTds.length > 0 ? ageTds[0].textContent.trim() : "Unknown";
+                # Average age
+                avg_age_elem = row.select_one('td:nth-of-type(4)')
+                avg_age = avg_age_elem.text.strip() if avg_age_elem else "Unknown"
 
-                    // Extract team
-                    const teamElem = row.querySelector('td.zentriert a[href*="/verein/"]');
-                    let team = "Unknown";
-                    if (teamElem) {
-                        const teamImg = teamElem.querySelector('img');
-                        if (teamImg) {
-                            team = teamImg.getAttribute('alt') || teamImg.getAttribute('title') || "Unknown";
-                            if (team === "" || team === "&nbsp;") {
-                                const href = teamElem.getAttribute('href');
-                                if (href && href.includes('/verein/')) {
-                                    const parts = href.split('/');
-                                    for (let i = 0; i < parts.length; i++) {
-                                        if (parts[i] === 'verein' && i > 0) {
-                                            team = parts[i-1].replace(/-/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                # Foreigners
+                foreigners_elem = row.select_one('td:nth-of-type(5)')
+                foreigners = foreigners_elem.text.strip() if foreigners_elem else "Unknown"
 
-                    // Extract market value
-                    let value = "Unknown";
-                    const valueElems = row.querySelectorAll('td.rechts');
-                    for (const elem of valueElems) {
-                        if (elem.textContent.includes('€')) {
-                            value = elem.textContent.trim();
-                            break;
-                        }
-                    }
+                # Average market value
+                avg_value_elem = row.select_one('td:nth-of-type(6)')
+                avg_market_value = avg_value_elem.text.strip() if avg_value_elem else "Unknown"
 
-                    players.push({
-                        player_name: playerName,
-                        position: position,
-                        nationality: nationality,
-                        age: age,
-                        team: team,
-                        value: value
-                    });
-                } catch (e) {
-                    console.error('Error processing row:', e);
+                # Total market value
+                total_value_elem = row.select_one('td:nth-of-type(7) a')
+                total_market_value = total_value_elem.text.strip() if total_value_elem else "Unknown"
+
+                # Champion/Promoted status
+                status = "Regular"
+                if row.select_one('span.icon-aufsteiger'):
+                    status = "Promoted"
+                elif row.select_one('img.tabelle-erfolg[title*="Champion"]'):
+                    status = "Champion"
+
+                team_data = {
+                    'team_name': team_name,
+                    'league': league_info['name'],
+                    'season': season,
+                    'squad_size': squad_size,
+                    'average_age': avg_age,
+                    'foreigners': foreigners,
+                    'average_market_value': avg_market_value,
+                    'total_market_value': total_market_value,
+                    'status': status,
+                    'crawl_date': datetime.now().strftime('%Y-%m-%d')
                 }
-            });
 
-            return JSON.stringify(players);
-            """
+                team_values.append(team_data)
+                print(f"Added team: {team_name}, Total Value: {total_market_value}")
 
-            # Execute JavaScript to extract data
-            result = driver.execute_script(player_data_script)
+            except Exception as e:
+                print(f"Error processing team row: {e}")
+                traceback.print_exc()
+                continue
 
-            import json
-            extracted_players = json.loads(result)
-            print(f"JavaScript extracted {len(extracted_players)} players")
-
-            # Process the extracted data
-            for player_data in extracted_players:
-                player_data['league'] = league_name
-                player_data['season'] = season
-                player_values.append(player_data)
-
-                print(
-                    f"Added player: {player_data['player_name']}, {player_data['position']}, Value: {player_data['value']}")
-
-            # Check if there's a next page using JavaScript
-            has_next_page_script = """
-            const nextButton = document.querySelector('li.tm-pagination__list-item--icon-next-page');
-            return nextButton !== null;
-            """
-
-            has_next_page = driver.execute_script(has_next_page_script)
-
-            if has_next_page and current_page < 10:
-                current_page += 1
-                # Wait between pages to avoid being blocked
-                delay = random.uniform(3, 5)
-                print(f"Waiting {delay:.1f}s before loading next page...")
-                time.sleep(delay)
-            else:
-                has_next_page = False
-                print("No more pages or reached page limit")
+        return team_values
 
     except Exception as e:
-        print(f"Error crawling player values: {e}")
+        print(f"Error in crawl_league_team_values: {e}")
+        traceback.print_exc()
+        return []
+
+
+
+def crawl_league_teams(league, season):
+    """
+    Crawl all teams in a league and get player values for each team.
+    """
+    # Mapping leagues to their correct transfermarkt slugs and codes
+    league_mapping = {
+        "premierleague": {"slug": "premier-league", "code": "GB1", "name": "Premier League"},
+        "bundesliga": {"slug": "bundesliga", "code": "L1", "name": "Bundesliga"},
+        "laliga": {"slug": "laliga", "code": "ES1", "name": "LaLiga"},
+        "seriea": {"slug": "serie-a", "code": "IT1", "name": "Serie A"},
+        "ligue1": {"slug": "ligue-1", "code": "FR1", "name": "Ligue 1"}
+    }
+
+    all_players = []
+
+    try:
+        league_info = league_mapping.get(league, {"slug": "premier-league", "code": "GB1", "name": "Premier League"})
+        league_slug = league_info["slug"]
+        league_code = league_info["code"]
+
+        # URL to get all teams in the league
+        url = f"https://www.transfermarkt.com/{league_slug}/startseite/wettbewerb/{league_code}?saison_id={season}"
+
+        # Use requests for the league page too
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml',
+            'Referer': 'https://www.transfermarkt.com/'
+        }
+
+        print(f"Getting teams for {league_info['name']} season {season}")
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 200:
+            print(f"Failed to fetch league page: {response.status_code}")
+            # Debug - save the response content
+            with open(f"debug_{league}_{season}.html", "w", encoding="utf-8") as f:
+                f.write(response.text)
+            return []
+
+        # Debug - save the HTML content for inspection
+        with open(f"debug_{league}_{season}.html", "w", encoding="utf-8") as f:
+            f.write(response.text)
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Find all team links - try multiple selector patterns
+        team_links = []
+
+        # Try different selectors to find team links
+        selectors = [
+            "a.vereinprofil_tooltip",
+            "td.hauptlink a",
+            "table.items tbody tr td a[href*='/verein/']"
+        ]
+
+        for selector in selectors:
+            team_elems = soup.select(selector)
+            for team_elem in team_elems:
+                href = team_elem.get('href', '')
+                if href and "/startseite/verein/" in href:
+                    if not href.startswith('http'):
+                        href = f"https://www.transfermarkt.com{href}"
+                    if href not in team_links:
+                        team_links.append(href)
+
+            if team_links:
+                print(f"Found {len(team_links)} teams using selector: {selector}")
+                break
+
+        if not team_links:
+            print(f"No team links found for {league} season {season}")
+            return []
+
+        # Process each team
+        for i, team_url in enumerate(team_links):
+            try:
+                print(f"Processing team {i + 1}/{len(team_links)}: {team_url}")
+                team_players = crawl_team_with_requests(team_url)
+                all_players.extend(team_players)
+
+                # Wait between teams to avoid being blocked
+                delay = random.uniform(5, 10)
+                print(f"Waiting {delay:.1f}s before next team...")
+                time.sleep(delay)
+
+            except Exception as e:
+                print(f"Error processing team {team_url}: {e}")
+                traceback.print_exc()
+                continue
+
+    except Exception as e:
+        print(f"Error in crawl_league_teams: {e}")
         traceback.print_exc()
 
-    finally:
-        driver.quit()
+    return all_players
+# Example usage:
+# 1. Crawl a single team
+# players = crawl_team_player_values("https://www.transfermarkt.com/real-madrid/startseite/verein/418/saison_id/2024")
+# pd.DataFrame(players).to_csv("real_madrid_players.csv", index=False)
 
-    print(f"Collected data for {len(player_values)} players from {league} {season}")
-    return player_values
+# 2. Crawl all teams in a league
+# laliga_players = crawl_league_teams("laliga", 2024)
+# pd.DataFrame(laliga_players).to_csv("laliga_players_2024.csv", index=False)
 
-
+# 3. Crawl multiple leagues and seasons
 leagues = ["premierleague", "laliga", "seriea", "bundesliga", "ligue1"]
-seasons = list(range(2014, 2024))  # 2014–2023 -> mùa 2014–2015 đến 2023–2024
+seasons = list(range(2014, 2025))  # 2014-2015 to 2024-2025 seasons
 
-all_player_values = []
+all_players = []
+all_team_values = []
 
 for league in leagues:
     for season in seasons:
-        print(f"Đang crawl dữ liệu {league} mùa {season}...")
+        print(f"Processing {league} for season {season}")
+        league_team_values = crawl_league_team_values(league, season)
+        all_team_values.extend(league_team_values)
+        league_players = crawl_league_teams(league, season)
+        all_players.extend(league_players)
 
-        player_values = crawl_player_values(league, season)
-        all_player_values.extend(player_values)
+        # Wait between leagues/seasons to avoid being blocked
+        time.sleep(15)
 
-        # Tránh bị chặn
-        time.sleep(10)
+# Save all data
+pd.DataFrame(all_players).to_csv("all_player_values.csv", index=False)
+pd.DataFrame(all_team_values).to_csv("all_team_values.csv", index=False)
 
-pd.DataFrame(all_player_values).to_csv("player_values.csv", index=False)
+# players = crawl_team_with_requests("https://www.transfermarkt.com/real-madrid/startseite/verein/418/saison_id/2024")
+# pd.DataFrame(players).to_csv("test.csv", index=False)
+
+        # print(f"Processing {"premierleague"} for season {2014}")
+# league_team_values = crawl_league_team_values("premierleague", 2014)
+# all_team_values.extend(league_team_values)
+# pd.DataFrame(all_team_values).to_csv("all_team_values.csv", index=False)
