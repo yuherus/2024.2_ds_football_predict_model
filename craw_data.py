@@ -1,10 +1,12 @@
 import pandas as pd
 import time
+import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
 
 def setup_driver():
     """Thiết lập WebDriver với các tùy chọn phù hợp."""
@@ -102,12 +104,70 @@ def crawl_player_stats(league, season):
     # Tương tự như các hàm trên
     # ...
 
+def crawl_fixtures_fbref(league, season_str):
+    """Crawl lịch thi đấu chưa diễn ra từ FBref."""
+    print(f"Crawling fixtures for {league} season {season_str}...")
+    league_ids = {
+        "premierleague": (9, "Premier-League"),
+        "laliga": (12, "La-Liga"),
+        "seriea": (11, "Serie-A"),
+        "bundesliga": (20, "Bundesliga"),
+        "ligue1": (13, "Ligue-1"),
+    }
+
+    if league not in league_ids:
+        print(f"League {league} không được hỗ trợ.")
+        return []
+
+    league_id, league_url = league_ids[league]
+    url = f"https://fbref.com/en/comps/{league_id}/schedule/{season_str}-{league_url}-Scores-and-Fixtures"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print(f"Không thể truy cập {url} - status code: {response.status_code}")
+        return []
+
+    soup = BeautifulSoup(response.content, "html.parser")
+    table = soup.find("table", id=lambda x: x and x.startswith("sched_"))
+    if not table:
+        print("Không tìm thấy bảng lịch thi đấu.")
+        return []
+
+    fixtures = []
+    for row in table.find_all("tr")[1:]:
+        cells = row.find_all(["th", "td"])
+        if len(cells) < 10:
+            continue
+
+        fixture = {
+            "round": cells[0].text.strip(),             # Tuần
+            "day": cells[1].text.strip(),               # Thứ
+            "date": cells[2].text.strip(),              # Ngày cụ thể
+            "time": cells[3].text.strip(),              # Giờ đá
+            "home_team": cells[4].text.strip(),         # Đội nhà
+            "away_team": cells[8].text.strip(),         # Đội khách
+            "venue": cells[10].text.strip(),            # Địa điểm
+            "league": league,
+            "season": season_str
+        }
+        fixtures.append(fixture)
+
+    return fixtures
+
 # Sử dụng các hàm để crawl dữ liệu
-leagues = ["premierleague"]
-seasons = [2022] # Thay đổi thành các mùa giải khác nếu cần
+# leagues = ["premierleague"]
+# seasons = [2022] # Thay đổi thành các mùa giải khác nếu cần
+
+leagues = ["premierleague", "laliga", "seriea", "bundesliga", "ligue1"]
+seasons = list(range(2014, 2024))  # 2014–2023 -> mùa 2014–2015 đến 2023–2024
 
 all_match_results = []
 all_team_stats = []
+all_fixtures = []
 
 for league in leagues:
     for season in seasons:
@@ -120,6 +180,11 @@ for league in leagues:
         # Crawl thống kê đội bóng
         # team_stats = crawl_team_stats(league, season)
         # all_team_stats.extend(team_stats)
+
+         # Crawl lịch thi đấu từ FBref
+        season_str = f"{season}-{season+1}"
+        fixtures = crawl_fixtures_fbref(league, season_str)
+        all_fixtures.extend(fixtures)
         
         # Tránh bị chặn
         time.sleep(10)
@@ -127,3 +192,4 @@ for league in leagues:
 # Lưu dữ liệu vào file CSV
 pd.DataFrame(all_match_results).to_csv("match_results.csv", index=False)
 # pd.DataFrame(all_team_stats).to_csv("team_stats.csv", index=False)
+pd.DataFrame(all_fixtures).to_csv("data/fixtures.csv", index=False)
