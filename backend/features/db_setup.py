@@ -1,6 +1,6 @@
 # football_project/db_setup.py
 from sqlalchemy import text as sqlalchemy_text
-from utils import get_pg_engine  # Import from local utils
+from backend.features.utils import get_pg_engine  # Sửa đường dẫn import
 
 
 def create_db_tables():
@@ -71,8 +71,36 @@ def create_db_tables():
         '''))
         connection.execute(sqlalchemy_text(
             '''CREATE INDEX IF NOT EXISTS idx_matches_featured_season_date ON matches_featured (season, match_date, round);'''))
+        
+        # Match Predictions table - Để hiển thị kết quả dự đoán lên website
+        connection.execute(sqlalchemy_text('''
+        CREATE TABLE IF NOT EXISTS match_predictions (
+            id SERIAL PRIMARY KEY,
+            match_date TIMESTAMP WITH TIME ZONE,
+            round INTEGER,
+            home_team TEXT,
+            away_team TEXT,
+            home_win_prob REAL,
+            draw_prob REAL,
+            away_win_prob REAL,
+            home_win_pct TEXT,
+            draw_pct TEXT,
+            away_win_pct TEXT,
+            league TEXT,
+            season TEXT,
+            venue TEXT,
+            prediction_model TEXT,
+            predicted_result INTEGER,
+            actual_result INTEGER,
+            prediction_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT unique_prediction UNIQUE (match_date, home_team, away_team, prediction_model)
+        )
+        '''))
+        connection.execute(sqlalchemy_text(
+            '''CREATE INDEX IF NOT EXISTS idx_match_predictions_date ON match_predictions (match_date);'''))
+        
         connection.commit()
-        print("PostgreSQL tables 'squads', 'matches_raw', and 'matches_featured' checked/created.")
+        print("PostgreSQL tables 'squads', 'matches_raw', 'matches_featured', and 'match_predictions' checked/created.")
 
 
 if __name__ == '__main__':

@@ -3,11 +3,11 @@ import os
 from sqlalchemy import text as sqlalchemy_text  # For clearing tables
 
 # Import functions from other modules
-from config import ALL_PLAYERS_CSV_PATH, MATCH_RESULTS_CSV_PATH
-from utils import get_pg_engine
-from db_setup import create_db_tables
-from data_loader import load_squads_data, load_raw_matches_data
-from feature_engineering import process_all_seasons_and_store_features
+from backend.features.config import ALL_PLAYERS_CSV_PATH, MATCH_RESULTS_CSV_PATH
+from backend.features.utils import get_pg_engine
+from backend.features.db_setup import create_db_tables
+from backend.features.data_loader import load_squads_data, load_raw_matches_data
+from backend.features.feature_engineering import process_all_seasons_and_store_features
 
 def clear_tables_for_rerun(engine, tables_to_clear=None):
     """Optionally clear tables before a full data processing run."""

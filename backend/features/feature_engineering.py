@@ -2,8 +2,8 @@
 import pandas as pd
 import numpy as np
 from collections import deque
-from utils import get_pg_engine, get_points  # Import from local utils
-from config import MATCHES_FEATURED_COLUMN_ORDER, FEATURED_FLOAT_COLS, FEATURED_INT_COLS
+from backend.features.utils import get_pg_engine, get_points  # Sửa đường dẫn import
+from backend.features.config import MATCHES_FEATURED_COLUMN_ORDER, FEATURED_FLOAT_COLS, FEATURED_INT_COLS
 
 
 def calculate_standings_for_season(matches_df_season_upto_round):
@@ -109,7 +109,7 @@ def engineer_features_for_season(season_df, engine):
                 team_histories[team] = {
                     'points': deque(maxlen=5), 'goals_scored': deque(maxlen=5),
                     'goals_conceded': deque(maxlen=5), 'results': deque(),  # For streaks
-                    'home_games_played': 0, 'home_wins': 0,
+                    'home_games_played': 0, 'home_wins': 0, 'draws': 0,
                     'away_games_played': 0, 'away_wins': 0,
                     'total_possession_sum': 0.0, 'total_shots_on_target_sum': 0.0,  # Use floats for sums
                     'total_corners_sum': 0.0, 'games_for_avg_stats': 0
@@ -197,7 +197,7 @@ def engineer_features_for_season(season_df, engine):
                 valid_h2h_matches += 1
                 hs_h2h, as_h2h = h2h_row['home_score'], h2h_row['away_score']
                 if h2h_row['home_team'] == home_team:
-                    h2h_home_goals_sum += hs_h2h;
+                    h2h_home_goals_sum += hs_h2h
                     h2h_away_goals_sum += as_h2h
                     if hs_h2h > as_h2h:
                         h2h_home_wins_count += 1
@@ -206,7 +206,7 @@ def engineer_features_for_season(season_df, engine):
                     else:
                         h2h_draws_count += 1
                 else:
-                    h2h_home_goals_sum += as_h2h;
+                    h2h_home_goals_sum += as_h2h
                     h2h_away_goals_sum += hs_h2h
                     if as_h2h > hs_h2h:
                         h2h_home_wins_count += 1
@@ -246,6 +246,10 @@ def engineer_features_for_season(season_df, engine):
         features['away_corners_avg'] = (away_hist['total_corners_sum'] / away_hist['games_for_avg_stats']) if away_hist[
                                                                                                                   'games_for_avg_stats'] > 0 else np.nan
 
+        # Thêm đặc trưng tỷ lệ trận hòa của đội
+        features['home_draw_rate'] = home_hist['draws'] / (home_hist['home_games_played'] + home_hist['away_games_played']) if home_hist['home_games_played'] + home_hist['away_games_played'] > 0 else 0.0
+        features['away_draw_rate'] = away_hist['draws'] / (away_hist['away_games_played'] + away_hist['home_games_played']) if away_hist['away_games_played'] + away_hist['home_games_played'] > 0 else 0.0
+
         all_features_list.append(features)
 
         # --- UPDATE team_histories (for current season) ---
@@ -253,13 +257,14 @@ def engineer_features_for_season(season_df, engine):
         if pd.notna(home_s) and pd.notna(away_s):  # Only update if scores are valid
             home_pts_earned, away_pts_earned = get_points(home_s, away_s)
             if not (pd.isna(home_pts_earned) or pd.isna(away_pts_earned)):
-                home_hist['points'].append(home_pts_earned);
-                home_hist['goals_scored'].append(home_s);
+                home_hist['points'].append(home_pts_earned)
+                home_hist['goals_scored'].append(home_s)
                 home_hist['goals_conceded'].append(away_s)
                 if home_pts_earned == 3:
                     home_hist['results'].append('W')
                 elif home_pts_earned == 1:
                     home_hist['results'].append('D')
+                    home_hist['draws'] += 1
                 else:
                     home_hist['results'].append('L')
                 home_hist['home_games_played'] += 1
@@ -273,13 +278,14 @@ def engineer_features_for_season(season_df, engine):
                     'home_corners']
                 home_hist['games_for_avg_stats'] += 1
 
-                away_hist['points'].append(away_pts_earned);
-                away_hist['goals_scored'].append(away_s);
+                away_hist['points'].append(away_pts_earned)
+                away_hist['goals_scored'].append(away_s)
                 away_hist['goals_conceded'].append(home_s)
                 if away_pts_earned == 3:
                     away_hist['results'].append('W')
                 elif away_pts_earned == 1:
                     away_hist['results'].append('D')
+                    away_hist['draws'] += 1
                 else:
                     away_hist['results'].append('L')
                 away_hist['away_games_played'] += 1

@@ -2,8 +2,8 @@
 import pandas as pd
 import numpy as np
 import os
-from utils import get_pg_engine, preprocess_market_value, preprocess_percentage, preprocess_boolean_text
-from config import CHUNK_SIZE, RAW_MATCH_COLS_FROM_CSV, RAW_MATCH_NUMERIC_COLS_DERIVED
+from backend.features.utils import get_pg_engine, preprocess_market_value, preprocess_percentage, preprocess_boolean_text
+from backend.features.config import CHUNK_SIZE, RAW_MATCH_COLS_FROM_CSV, RAW_MATCH_NUMERIC_COLS_DERIVED
 
 
 def load_squads_data(csv_path):
@@ -172,7 +172,7 @@ def load_raw_matches_data(csv_path):
 
 
 if __name__ == '__main__':
-    from config import ALL_TEAMS_CSV_PATH, MATCH_RESULTS_CSV_PATH  # For standalone testing
+    from backend.features.config import ALL_TEAMS_CSV_PATH, MATCH_RESULTS_CSV_PATH  # For standalone testing
 
     # Ensure dummy files exist or point to real files for testing this module
     print("Testing data_loader.py...")

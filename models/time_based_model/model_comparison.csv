@@ -1,0 +1,3 @@
+Model,accuracy,precision,recall,f1,roc_auc
+XGBoost,0.5408670931058991,,,,
+LSTM,0.46111470460891724,,,,

@@ -1,0 +1,2 @@
+Method,XGBoost_Accuracy,XGBoost_F1,LSTM_Accuracy,LSTM_F1,Better_Model
+time-based,0.5408670931058991,,0.46111470460891724,,XGBoost

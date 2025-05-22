@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
-from config import DB_CONFIG # Import DB_CONFIG
+from backend.features.config import DB_CONFIG # Sửa đường dẫn import
 
 def get_pg_engine():
     db_url = f"postgresql+psycopg2://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"

@@ -3,9 +3,9 @@
 # --- PostgreSQL Connection Details ---
 # IMPORTANT: Replace with your actual credentials!
 DB_CONFIG = {
-    "dbname": "CHANGEME",
-    "user": "CHANGEME",
-    "password": "CHANGEME",
+    "dbname": "2024.2_ds",
+    "user": "postgres",
+    "password": "26102003",
     "host": "localhost",
     "port": 5432
 }
