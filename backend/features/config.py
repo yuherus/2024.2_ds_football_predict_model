@@ -3,11 +3,11 @@
 # --- PostgreSQL Connection Details ---
 # IMPORTANT: Replace with your actual credentials!
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': '5431',
-    'dbname': 'football_prediction',
-    'user': 'postgres',
-    'password': 'password'
+    "dbname": "2024.2_ds",
+    "user": "postgres",
+    "password": "26102003",
+    "host": "localhost",
+    "port": 5432
 }
 
 DB_URI = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
