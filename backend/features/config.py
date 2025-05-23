@@ -3,12 +3,14 @@
 # --- PostgreSQL Connection Details ---
 # IMPORTANT: Replace with your actual credentials!
 DB_CONFIG = {
-    "dbname": "2024.2_ds",
-    "user": "postgres",
-    "password": "26102003",
-    "host": "localhost",
-    "port": 5432
+    'host': 'localhost',
+    'port': '5431',
+    'dbname': 'football_prediction',
+    'user': 'postgres',
+    'password': 'password'
 }
+
+DB_URI = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
 
 # --- File Paths ---
 # IMPORTANT: Replace with paths to your actual CSV files!
