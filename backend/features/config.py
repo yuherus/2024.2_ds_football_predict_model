@@ -10,6 +10,8 @@ DB_CONFIG = {
     "port": 5432
 }
 
+DB_URI = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
+
 # --- File Paths ---
 # IMPORTANT: Replace with paths to your actual CSV files!
 ALL_PLAYERS_CSV_PATH = 'backend/data/all_player_values.csv'
