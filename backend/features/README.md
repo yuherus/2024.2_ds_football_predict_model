@@ -65,3 +65,14 @@ python -m backend.features.main_processor
 python -m backend.features.add_squad_value_features
 ```
 
+Để chạy mô phỏng monte carlo mô phỏng xác suất vô địch của mỗi đội:
+Phải huấn luyện mô hình trước: 
+```bash
+python -m backend.models.model_training
+```
+
+```bash
+python -m backend.features.run_championship_simulation
+```
+
+
