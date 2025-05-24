@@ -1,2 +1,2 @@
 League,Method,Train_size,Val_size,Test_size,XGBoost_Accuracy,XGBoost_F1,LSTM_Accuracy,LSTM_F1,Better_Model
-premierleague,time-based,2588,740,370,0.5702702702702702,,0.3789764940738678,,XGBoost
+premierleague,time-based,2588,740,370,0.5702702702702702,,0.458503395318985,,XGBoost

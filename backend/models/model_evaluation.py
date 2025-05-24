@@ -155,7 +155,7 @@ def plot_roc_curves(y_true, y_pred_proba, save_path=None):
     
     plt.close()
 
-def plot_learning_curves(history, save_path=None):
+def plot_learning_curves(history, metrics=['accuracy', 'loss'], save_path=None):
     """
     Plot learning curves for neural network training
     
@@ -163,33 +163,39 @@ def plot_learning_curves(history, save_path=None):
     -----------
     history : History
         Keras History object from model.fit
+    metrics : list
+        List of metrics to plot, default is ['accuracy', 'loss']
     save_path : str, optional
         Path to save the plot image
     """
-    plt.figure(figsize=(12, 5))
+    n_metrics = len(metrics)
+    fig_width = 6 * n_metrics
     
-    # Plot accuracy
-    plt.subplot(1, 2, 1)
-    plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
-    plt.title('Model Accuracy')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Validation'], loc='lower right')
+    plt.figure(figsize=(fig_width, 5))
     
-    # Plot loss
-    plt.subplot(1, 2, 2)
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('Model Loss')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Validation'], loc='upper right')
+    for i, metric in enumerate(metrics):
+        plt.subplot(1, n_metrics, i+1)
+        
+        if metric in history.history:
+            plt.plot(history.history[metric], label='Train')
+            
+            # Check if validation metric exists
+            val_metric = f'val_{metric}'
+            if val_metric in history.history:
+                plt.plot(history.history[val_metric], label='Validation')
+            
+            plt.title(f'Model {metric.capitalize()}')
+            plt.ylabel(metric.capitalize())
+            plt.xlabel('Epoch')
+            plt.legend(loc='best')
+            
+            # Add grid for better readability
+            plt.grid(True, linestyle='--', alpha=0.7)
     
     plt.tight_layout()
     
     if save_path:
-        plt.savefig(save_path)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Learning curves plot saved to {save_path}")
     else:
         plt.show()

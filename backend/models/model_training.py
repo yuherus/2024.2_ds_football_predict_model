@@ -70,7 +70,8 @@ def train_league_season_models(data, league, season, save_dir="models"):
     print(f"\nTraining XGBoost for {league} {season}...")
     xgb_start_time = time.time()
     
-    xgb_model = train_xgboost(X_train, y_train, X_val, y_val)
+    # Sử dụng GridSearchCV để tìm tham số tốt nhất
+    xgb_model = train_xgboost(X_train, y_train, X_val, y_val, use_grid_search=True)
     
     xgb_training_time = time.time() - xgb_start_time
     print(f"XGBoost training completed in {xgb_training_time:.2f} seconds")
@@ -95,7 +96,7 @@ def train_league_season_models(data, league, season, save_dir="models"):
     combined_data = pd.concat([historical_data, current_data]).sort_values('match_date')
     
     # Prepare sequences using historical + current data
-    X_seq, y_seq = prepare_lstm_sequences(combined_data)
+    X_seq, y_seq, match_info_seq = prepare_lstm_sequences(combined_data)
     
     if len(X_seq) < 50:
         print(f"Not enough sequence data for LSTM training for {league} {season}. Skipping LSTM.")
@@ -122,15 +123,23 @@ def train_league_season_models(data, league, season, save_dir="models"):
         
         X_train_seq = X_seq[train_seq_mask]
         y_train_seq = y_seq[train_seq_mask]
+        match_info_train = match_info_seq[train_seq_mask].reset_index(drop=True)
         
         X_current_seq = X_seq[current_seq_mask]
         y_current_seq = y_seq[current_seq_mask]
+        match_info_current = match_info_seq[current_seq_mask].reset_index(drop=True)
         
         # Further split current season data into val and test
         from sklearn.model_selection import train_test_split
-        X_val_seq, X_test_seq, y_val_seq, y_test_seq = train_test_split(
-            X_current_seq, y_current_seq, test_size=0.5, random_state=42, stratify=y_current_seq if len(set(y_current_seq)) > 1 else None
+        X_val_seq, X_test_seq, y_val_seq, y_test_seq, val_indices, test_indices = train_test_split(
+            X_current_seq, y_current_seq, np.arange(len(X_current_seq)), 
+            test_size=0.5, random_state=42, 
+            stratify=y_current_seq if len(set(y_current_seq)) > 1 else None
         )
+        
+        # Split match info accordingly
+        match_info_val = match_info_current.iloc[val_indices].reset_index(drop=True)
+        match_info_test = match_info_current.iloc[test_indices].reset_index(drop=True)
         
         print(f"LSTM training data: {X_train_seq.shape[0]} sequences")
         print(f"LSTM validation data: {X_val_seq.shape[0]} sequences")
@@ -151,8 +160,8 @@ def train_league_season_models(data, league, season, save_dir="models"):
             lstm_model, lstm_history = train_lstm(
                 X_train_seq, y_train_seq,
                 X_val_seq, y_val_seq,
-                batch_size=32,
-                epochs=50
+                batch_size=64,
+                epochs=100
             )
             
             lstm_training_time = time.time() - lstm_start_time
@@ -167,8 +176,47 @@ def train_league_season_models(data, league, season, save_dir="models"):
             if hasattr(lstm_model, 'save'):
                 lstm_model.save(lstm_model_path)
             
-            # Plot learning curves
-            plot_learning_curves(lstm_history, save_path=os.path.join(league_season_dir, "lstm_learning_curves.png"))
+            # Plot learning curves with more metrics
+            plot_learning_curves(
+                lstm_history, 
+                metrics=['accuracy', 'loss'],
+                save_path=os.path.join(league_season_dir, "lstm_learning_curves.png")
+            )
+            
+            # Plot additional metrics if available
+            if 'f1_score' in lstm_metrics and 'roc_auc' in lstm_metrics:
+                # Lưu các metrics bổ sung vào file
+                metrics_df = pd.DataFrame({
+                    'Metric': ['Accuracy', 'F1 Score', 'ROC AUC'],
+                    'Value': [
+                        lstm_metrics['accuracy'],
+                        lstm_metrics['f1_score'],
+                        lstm_metrics['roc_auc'] if lstm_metrics['roc_auc'] is not None else np.nan
+                    ]
+                })
+                metrics_df.to_csv(os.path.join(league_season_dir, "lstm_metrics.csv"), index=False)
+                
+                # Vẽ biểu đồ các metrics
+                plt.figure(figsize=(10, 6))
+                plt.bar(metrics_df['Metric'], metrics_df['Value'])
+                plt.title(f'LSTM Model Metrics for {league} {season}')
+                plt.ylim(0, 1)
+                plt.grid(axis='y', alpha=0.3)
+                plt.savefig(os.path.join(league_season_dir, "lstm_metrics_chart.png"))
+                plt.close()
+            
+            # Nếu có huấn luyện LSTM, lưu dự đoán LSTM
+            if lstm_metrics is not None:
+                # Với mô hình LSTM, chúng ta cần dữ liệu chuỗi từ tập test
+                # Giả sử X_test_seq và y_test_seq đã được chuẩn bị
+                if 'X_test_seq' in locals() and 'y_test_seq' in locals() and 'match_info_test' in locals():
+                    save_test_predictions(
+                        match_info_test, 
+                        X_test_seq,
+                        y_test_seq, 
+                        lstm_model, 
+                        model_type="lstm"
+                    )
     
     # Save model comparison if both models were trained
     if lstm_metrics is not None:
@@ -316,8 +364,8 @@ def save_test_predictions(test_data, X_test, y_test, model, model_type="xgboost"
     Parameters:
     -----------
     test_data : DataFrame
-        DataFrame gốc chứa dữ liệu test
-    X_test : DataFrame
+        DataFrame gốc chứa dữ liệu test hoặc DataFrame match_info cho LSTM
+    X_test : DataFrame hoặc ndarray
         Các đặc trưng của tập test
     y_test : ndarray
         Kết quả thực tế
@@ -331,7 +379,7 @@ def save_test_predictions(test_data, X_test, y_test, model, model_type="xgboost"
     int
         Số lượng dự đoán đã lưu
     """
-    print(f"Lưu dự đoán {model_type} cho {len(X_test)} trận đấu...")
+    print(f"Lưu dự đoán {model_type} cho {len(X_test)} mẫu...")
     
     # Thực hiện dự đoán
     if model_type.lower() == "xgboost":
@@ -339,14 +387,56 @@ def save_test_predictions(test_data, X_test, y_test, model, model_type="xgboost"
         dtest = xgb.DMatrix(X_test)
         y_pred_proba = model.predict(dtest)
         y_pred = np.argmax(y_pred_proba, axis=1)
+        
+        # Tạo DataFrame dự đoán cho XGBoost
+        predictions_df = prepare_prediction_dataframe(test_data, X_test, y_pred_proba, y_pred, y_test)
+        
     elif model_type.lower() == "lstm":
         y_pred_proba = model.predict(X_test)
         y_pred = np.argmax(y_pred_proba, axis=1)
+        
+        # Đối với LSTM, test_data nên là match_info_df
+        if isinstance(test_data, pd.DataFrame) and 'match_date' in test_data.columns and 'home_team' in test_data.columns:
+            match_info_df = test_data
+            print(f"Sử dụng match_info_df với {len(match_info_df)} trận đấu cho dự đoán LSTM")
+            
+            # Đảm bảo số lượng dự đoán khớp với số lượng trận đấu
+            if len(y_pred_proba) > len(match_info_df):
+                print(f"Cảnh báo: Số lượng dự đoán ({len(y_pred_proba)}) nhiều hơn số lượng trận đấu ({len(match_info_df)})")
+                y_pred_proba = y_pred_proba[:len(match_info_df)]
+                y_pred = y_pred[:len(match_info_df)]
+            elif len(y_pred_proba) < len(match_info_df):
+                print(f"Cảnh báo: Số lượng dự đoán ({len(y_pred_proba)}) ít hơn số lượng trận đấu ({len(match_info_df)})")
+                match_info_df = match_info_df.iloc[:len(y_pred_proba)]
+            
+            # Tạo DataFrame dự đoán từ match_info_df
+            predictions_df = pd.DataFrame()
+            predictions_df['match_date'] = match_info_df['match_date']
+            predictions_df['home_team'] = match_info_df['home_team']
+            predictions_df['away_team'] = match_info_df['away_team']
+            
+            if 'round' in match_info_df:
+                predictions_df['round'] = match_info_df['round']
+            if 'league' in match_info_df:
+                predictions_df['league'] = match_info_df['league']
+            if 'season' in match_info_df:
+                predictions_df['season'] = match_info_df['season']
+            
+            # Thêm kết quả dự đoán
+            probabilities_list = [probs.tolist() for probs in y_pred_proba]
+            predictions_df['probabilities'] = probabilities_list
+            
+            # Thêm kết quả thực tế nếu có
+            if y_test is not None and len(y_test) >= len(predictions_df):
+                predictions_df['actual_result'] = y_test[:len(predictions_df)]
+        else:
+            # Fallback nếu test_data không phải là match_info_df
+            print("Cảnh báo: test_data không chứa thông tin trận đấu cần thiết cho LSTM")
+            predictions_df = prepare_prediction_dataframe(test_data, 
+                                                        np.arange(len(y_pred)).reshape(-1, 1), 
+                                                        y_pred_proba, y_pred, y_test)
     else:
         raise ValueError(f"Loại mô hình không được hỗ trợ: {model_type}")
-    
-    # Tạo DataFrame dự đoán
-    predictions_df = prepare_prediction_dataframe(test_data, X_test, y_pred_proba, y_pred, y_test)
     
     # Lưu vào database
     return save_match_predictions(predictions_df, model_name=model_type)
@@ -438,9 +528,11 @@ def train_all_models(save_dir="models"):
         print(f"\nTraining XGBoost model for {league}...")
         xgb_start_time = time.time()
         
+        # Sử dụng GridSearchCV để tìm tham số tốt nhất
         xgb_model = train_xgboost(
             split_data['X_train'], split_data['y_train'],
-            split_data['X_val'], split_data['y_val']
+            split_data['X_val'], split_data['y_val'],
+            use_grid_search=True
         )
         
         xgb_training_time = time.time() - xgb_start_time
@@ -478,7 +570,7 @@ def train_all_models(save_dir="models"):
         league_specific_data = df_clean[df_clean['league'] == league].sort_values('match_date')
         
         # Prepare sequences
-        X_seq, y_seq = prepare_lstm_sequences(league_specific_data)
+        X_seq, y_seq, match_info_seq = prepare_lstm_sequences(league_specific_data)
         
         if len(X_seq) < 100:
             print(f"Not enough sequence data for LSTM training for {league}. Skipping LSTM.")
@@ -491,20 +583,23 @@ def train_all_models(save_dir="models"):
             val_seasons = split_data['seasons_info']['val_seasons']
             test_seasons = split_data['seasons_info']['test_seasons']
             
-            # We need to map sequences back to their match dates
-            # This is a simplification - ideally we'd track exact match indices
-            train_idx = int(len(X_seq) * 0.7)  # Roughly 70% for train
-            val_idx = int(len(X_seq) * 0.9)    # Next 20% for validation
+            # Tạo mask dựa trên thông tin mùa giải trong match_info_seq
+            train_mask = match_info_seq['season'].isin(train_seasons)
+            val_mask = match_info_seq['season'].isin(val_seasons)
+            test_mask = match_info_seq['season'].isin(test_seasons)
             
             # Split sequences
-            X_train_seq = X_seq[:train_idx]
-            y_train_seq = y_seq[:train_idx]
+            X_train_seq = X_seq[train_mask]
+            y_train_seq = y_seq[train_mask]
+            match_info_train = match_info_seq[train_mask].reset_index(drop=True)
             
-            X_val_seq = X_seq[train_idx:val_idx]
-            y_val_seq = y_seq[train_idx:val_idx]
+            X_val_seq = X_seq[val_mask]
+            y_val_seq = y_seq[val_mask]
+            match_info_val = match_info_seq[val_mask].reset_index(drop=True)
             
-            X_test_seq = X_seq[val_idx:]
-            y_test_seq = y_seq[val_idx:]
+            X_test_seq = X_seq[test_mask]
+            y_test_seq = y_seq[test_mask]
+            match_info_test = match_info_seq[test_mask].reset_index(drop=True)
             
             print(f"LSTM training data: {len(X_train_seq)} sequences")
             print(f"LSTM validation data: {len(X_val_seq)} sequences")
@@ -525,8 +620,8 @@ def train_all_models(save_dir="models"):
                 lstm_model, lstm_history = train_lstm(
                     X_train_seq, y_train_seq,
                     X_val_seq, y_val_seq,
-                    batch_size=32,
-                    epochs=50
+                    batch_size=64,
+                    epochs=100
                 )
                 
                 lstm_training_time = time.time() - lstm_start_time
@@ -541,16 +636,42 @@ def train_all_models(save_dir="models"):
                 if hasattr(lstm_model, 'save'):
                     lstm_model.save(lstm_model_path)
                 
-                # Plot learning curves
-                plot_learning_curves(lstm_history, save_path=os.path.join(league_dir, "lstm_learning_curves.png"))
+                # Plot learning curves with more metrics
+                plot_learning_curves(
+                    lstm_history, 
+                    metrics=['accuracy', 'loss'],
+                    save_path=os.path.join(league_dir, "lstm_learning_curves.png")
+                )
+                
+                # Plot additional metrics if available
+                if 'f1_score' in lstm_metrics and 'roc_auc' in lstm_metrics:
+                    # Lưu các metrics bổ sung vào file
+                    metrics_df = pd.DataFrame({
+                        'Metric': ['Accuracy', 'F1 Score', 'ROC AUC'],
+                        'Value': [
+                            lstm_metrics['accuracy'],
+                            lstm_metrics['f1_score'],
+                            lstm_metrics['roc_auc'] if lstm_metrics['roc_auc'] is not None else np.nan
+                        ]
+                    })
+                    metrics_df.to_csv(os.path.join(league_dir, "lstm_metrics.csv"), index=False)
+                    
+                    # Vẽ biểu đồ các metrics
+                    plt.figure(figsize=(10, 6))
+                    plt.bar(metrics_df['Metric'], metrics_df['Value'])
+                    plt.title(f'LSTM Model Metrics for {league}')
+                    plt.ylim(0, 1)
+                    plt.grid(axis='y', alpha=0.3)
+                    plt.savefig(os.path.join(league_dir, "lstm_metrics_chart.png"))
+                    plt.close()
                 
                 # Nếu có huấn luyện LSTM, lưu dự đoán LSTM
                 if lstm_metrics is not None:
                     # Với mô hình LSTM, chúng ta cần dữ liệu chuỗi từ tập test
                     # Giả sử X_test_seq và y_test_seq đã được chuẩn bị
-                    if 'X_test_seq' in locals() and 'y_test_seq' in locals():
+                    if 'X_test_seq' in locals() and 'y_test_seq' in locals() and 'match_info_test' in locals():
                         save_test_predictions(
-                            test_data_original, 
+                            match_info_test, 
                             X_test_seq,
                             y_test_seq, 
                             lstm_model, 

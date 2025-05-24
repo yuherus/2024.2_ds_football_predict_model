@@ -209,41 +209,119 @@ def split_data_by_time_and_league(data, features, target):
     return results
 
 def prepare_lstm_sequences(df, seq_length=5, target_col='match_result'):
-    """Prepare sequence data for LSTM model"""
+    """
+    Prepare enhanced sequence data for LSTM model with more features and normalization
+    
+    Parameters:
+    -----------
+    df : DataFrame
+        DataFrame containing match data, sorted by date
+    seq_length : int
+        Number of previous matches to include in each sequence
+    target_col : str
+        Column name for the target variable
+        
+    Returns:
+    --------
+    tuple
+        (X_sequences, y_targets, match_info) as numpy arrays and DataFrame
+        match_info contains information about the next match for each sequence
+    """
     import numpy as np
+    from sklearn.preprocessing import StandardScaler
     
     # Assuming data is sorted by date and team
     sequences = []
     targets = []
+    match_info = []  # Thêm danh sách để lưu thông tin về trận đấu tiếp theo
+    
+    # Define features to include in sequences
+    sequence_features = [
+        'home_points', 'away_points', 'home_score', 'away_score',
+        'home_points_last_5', 'away_points_last_5', 'home_standing', 'away_standing',
+        'standing_diff', 'points_diff', 'home_goal_diff', 'away_goal_diff',
+        'home_win_streak', 'away_win_streak', 'home_loss_streak', 'away_loss_streak',
+        'home_possession_avg', 'away_possession_avg', 'home_shots_on_target_avg',
+        'away_shots_on_target_avg', 'home_corners_avg', 'away_corners_avg'
+    ]
+    
+    # Check which features are actually available in the dataframe
+    available_features = [f for f in sequence_features if f in df.columns]
+    
+    if len(available_features) < 4:
+        raise ValueError(f"Not enough features available in dataframe. Found only: {available_features}")
+    
+    print(f"Using {len(available_features)} features for LSTM sequences: {available_features}")
+    
+    # Initialize scaler
+    scaler = StandardScaler()
+    
+    # Fit scaler on all available feature data
+    feature_data = df[available_features].values
+    scaler.fit(feature_data)
     
     teams = df['home_team'].unique()
     
     for team in teams:
+        # Get all matches involving this team
         team_matches = df[(df['home_team'] == team) | (df['away_team'] == team)].sort_values('match_date')
         
         if len(team_matches) < seq_length + 1:
             continue
             
         for i in range(len(team_matches) - seq_length):
+            # Get sequence of matches
             seq = team_matches.iloc[i:i+seq_length]
             next_match = team_matches.iloc[i+seq_length]
             
-            # Extract features 
-            seq_features = seq[['home_points', 'away_points', 'home_score', 'away_score']].values
+            # Extract and normalize features
+            seq_features = seq[available_features].values
+            seq_features_scaled = scaler.transform(seq_features)
+            
+            # Add team position indicator (1 for home, 0 for away in each match)
+            is_home = np.array([1 if match['home_team'] == team else 0 for _, match in seq.iterrows()]).reshape(-1, 1)
+            
+            # Combine normalized features with team position indicator
+            seq_features_final = np.hstack([seq_features_scaled, is_home])
             
             # Extract target for next match
             if next_match['home_team'] == team:
                 target_val = next_match[target_col]
+                is_home_next = 1
             else:
                 # Invert the target if team is away
-                if next_match[target_col] == 0: # home loss = away win
+                if next_match[target_col] == 0:  # home loss = away win
                     target_val = 2  
-                elif next_match[target_col] == 2: # home win = away loss
+                elif next_match[target_col] == 2:  # home win = away loss
                     target_val = 0  
-                else: # Draw remains draw
+                else:  # Draw remains draw
                     target_val = 1
-                    
-            sequences.append(seq_features)
+                is_home_next = 0
+            
+            # Add the sequence and target to our lists
+            sequences.append(seq_features_final)
             targets.append(target_val)
             
-    return np.array(sequences), np.array(targets)
+            # Lưu thông tin về trận đấu tiếp theo
+            match_info.append({
+                'match_date': next_match['match_date'],
+                'home_team': next_match['home_team'],
+                'away_team': next_match['away_team'],
+                'league': next_match['league'] if 'league' in next_match else None,
+                'season': next_match['season'] if 'season' in next_match else None,
+                'round': next_match['round'] if 'round' in next_match else None,
+                'team_focus': team,
+                'is_home': is_home_next
+            })
+    
+    # Convert to numpy arrays
+    X = np.array(sequences)
+    y = np.array(targets)
+    
+    # Convert match_info to DataFrame
+    match_info_df = pd.DataFrame(match_info)
+    
+    print(f"Created {len(X)} sequences with shape {X.shape}")
+    print(f"Match info DataFrame shape: {match_info_df.shape}")
+    
+    return X, y, match_info_df
