@@ -11,9 +11,9 @@ const MatchRow = ({ match }) => {
       </div>
       
       <div className="flex gap-3 justify-center">
-        <MatchPrediction prediction={{ label: 'Thắng', value: match.predictions.home_win }} />
-        <MatchPrediction prediction={{ label: 'Hòa', value: match.predictions.draw }} />
-        <MatchPrediction prediction={{ label: 'Thua', value: match.predictions.away_win }} />
+        <MatchPrediction prediction={{ label: 'Thắng', value: (match.predictions.home_win*100).toFixed(4) }} />
+        <MatchPrediction prediction={{ label: 'Hòa', value: (match.predictions.draw*100).toFixed(4) }} />
+        <MatchPrediction prediction={{ label: 'Thua', value: (match.predictions.away_win*100).toFixed(4) }} />
       </div>
       
       <div className="text-right text-gray-600 md:text-center text-sm">

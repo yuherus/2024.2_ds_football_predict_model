@@ -144,7 +144,8 @@ async def get_predictions(
     team: Optional[str] = Query(None, description="Filter by team name (home or away)"),
     limit: Optional[int] = Query(None, description="Number of predictions to return", ge=1, le=1000),
     offset: int = Query(0, description="Offset for pagination", ge=0),
-    upcoming_only: bool = Query(False, description="Only return upcoming matches")
+    upcoming_only: bool = Query(False, description="Only return upcoming matches"),
+    model: Optional[str] = Query(None, description="Filter by prediction model")
 ):
     try:
         engine = get_pg_engine()
@@ -161,6 +162,9 @@ async def get_predictions(
             params["team"] = team
         if upcoming_only:
             query += " AND match_date > CURRENT_TIMESTAMP"
+        if model:
+            query += " AND prediction_model = :model"
+            params["model"] = model
 
         query += " ORDER BY league, round, match_date DESC LIMIT :limit OFFSET :offset"
         params["limit"] = limit
@@ -221,6 +225,7 @@ async def get_predictions(
 async def get_championship_probabilities(
     limit: Optional[int] = Query(100, description="Số bản ghi trả về", ge=1, le=1000),
     offset: int = Query(0, description="Phân trang offset", ge=0),
+    model: Optional[str] = Query(None, description="Filter by model")
 ):
     try:
         engine = get_pg_engine()
@@ -231,6 +236,10 @@ async def get_championship_probabilities(
         LIMIT :limit OFFSET :offset
         """
         params = {"limit": limit, "offset": offset}
+
+        if model:
+            query += " AND prediction_model = :model"
+            params["model"] = model
 
         with engine.connect() as conn:
             result = conn.execute(text(query), params)

@@ -12,7 +12,7 @@ const MatchesSection = ({ league, selectedRound, searchTerm }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("http://localhost:8000/matches/predictions/");
+        const response = await fetch("http://localhost:8000/matches/predictions?model=xgboost");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

@@ -12,7 +12,7 @@ const ChampionshipTable = ({ league, searchTerm }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("http://localhost:8000/championship_probabilities/");
+        const response = await fetch("http://localhost:8000/championship_probabilities");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -79,7 +79,7 @@ const ChampionshipTable = ({ league, searchTerm }) => {
                   </td>
                   <td className="p-4">
                     <span className={`px-3 py-1 rounded-full text-white font-bold text-center min-w-16 inline-block ${getProbabilityClass(team.championship_probability)}`}>
-                      {team.championship_probability}%
+                      {(team.championship_probability * 100).toFixed(4)}%
                     </span>
                   </td>
                   <td className="p-4 font-medium">{team.points}</td>
