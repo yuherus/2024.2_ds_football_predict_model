@@ -12,7 +12,7 @@ const ChampionshipTable = ({ league, searchTerm }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("http://localhost:8000/championship_probabilities/");
+        const response = await fetch("http://localhost:8000/championship_probabilities");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -56,8 +56,6 @@ const ChampionshipTable = ({ league, searchTerm }) => {
             <th className="p-4 text-left font-semibold uppercase tracking-wide text-sm">Hạng</th>
             <th className="p-4 text-left font-semibold uppercase tracking-wide text-sm">Câu lạc bộ</th>
             <th className="p-4 text-left font-semibold uppercase tracking-wide text-sm">Xác suất vô địch</th>
-            <th className="p-4 text-left font-semibold uppercase tracking-wide text-sm">Điểm hiện tại</th>
-            <th className="p-4 text-left font-semibold uppercase tracking-wide text-sm">Phong độ</th>
           </tr>
         </thead>
         <tbody>
@@ -69,21 +67,14 @@ const ChampionshipTable = ({ league, searchTerm }) => {
                   <td className="p-4">{team.rank}</td>
                   <td className="p-4">
                     <div className="flex items-center">
-                      <img
-                        src="/api/placeholder/30/30"
-                        alt={team.team_name}
-                        className="w-8 h-8 rounded-full mr-3"
-                      />
                       <span className="font-semibold text-blue-900">{team.team_name}</span>
                     </div>
                   </td>
                   <td className="p-4">
                     <span className={`px-3 py-1 rounded-full text-white font-bold text-center min-w-16 inline-block ${getProbabilityClass(team.championship_probability)}`}>
-                      {team.championship_probability}%
+                      {(team.championship_probability * 100).toFixed(4)}%
                     </span>
                   </td>
-                  <td className="p-4 font-medium">{team.points}</td>
-                  <td className="p-4 font-mono">{team.form}</td>
                 </tr>
               ))
             )

@@ -19,39 +19,41 @@ def run_championship_calculation(leagues, seasons):
         print(f"Error creating table: {str(e)}")
         return
     
-    total_combinations = len(leagues) * len(seasons)
+    prediction_models = ['lstm', 'xgboost']
+    total_combinations = len(leagues) * len(seasons) * len(prediction_models)
     current = 0
     start_time = time.time()
     
     for league in leagues:
         for season in seasons:
-            current += 1
-            print(f"\nProcessing {league} {season} ({current}/{total_combinations})")
-            try:
-                results = calculate_championship_probabilities(league, season)
-                if results:
-                    print(f"\nChampionship Results for {league} {season}:")
-                    print("="*80)
-                    print(f"{'Team':<30} {'Championships':<15} {'Probability':<15}")
-                    print("-"*80)
-                    for team in results:
-                        championships = int(team['championship_probability'] * 10000)  # Convert probability to number of championships
-                        print(f"{team['team_name']:<30} {championships:<15} {team['championship_probability']:.2%}")
-                    print("="*80)
-                else:
-                    print(f"No data available for {league} {season}")
-            except Exception as e:
-                print(f"Error processing {league} {season}: {str(e)}")
-                continue
-            
-            # Calculate and display progress
-            elapsed_time = time.time() - start_time
-            avg_time_per_league = elapsed_time / current
-            remaining_leagues = total_combinations - current
-            estimated_remaining_time = avg_time_per_league * remaining_leagues
-            
-            print(f"\nProgress: {current}/{total_combinations} leagues processed")
-            print(f"Estimated time remaining: {estimated_remaining_time/60:.1f} minutes")
+            for model in prediction_models:
+                current += 1
+                print(f"\nProcessing {league} {season} with {model.upper()} model ({current}/{total_combinations})")
+                try:
+                    results = calculate_championship_probabilities(league, season, model)
+                    if results:
+                        print(f"\nChampionship Results for {league} {season} ({model.upper()}):")
+                        print("="*100)
+                        print(f"{'Rank':<6} {'Team':<30} {'Championships':<15} {'Probability':<15} {'Points':<10} {'Remaining':<10} {'Form':<10}")
+                        print("-"*100)
+                        for team in results:
+                            championships = int(team['championship_probability'] * 1000)  # Convert probability to number of championships
+                            print(f"{team['rank']:<6} {team['team_name']:<30} {championships:<15} {team['championship_probability']:.2%} {team['points']:<10} {team['remaining_matches']:<10} {team['form']:<10}")
+                        print("="*100)
+                    else:
+                        print(f"No data available for {league} {season} with {model.upper()} model")
+                except Exception as e:
+                    print(f"Error processing {league} {season} with {model.upper()} model: {str(e)}")
+                    continue
+                
+                # Calculate and display progress
+                elapsed_time = time.time() - start_time
+                avg_time_per_combination = elapsed_time / current
+                remaining_combinations = total_combinations - current
+                estimated_remaining_time = avg_time_per_combination * remaining_combinations
+                
+                print(f"\nProgress: {current}/{total_combinations} combinations processed")
+                print(f"Estimated time remaining: {estimated_remaining_time/60:.1f} minutes")
     
     total_time = time.time() - start_time
     print(f"\nChampionship probability calculation completed in {total_time/60:.1f} minutes!")
