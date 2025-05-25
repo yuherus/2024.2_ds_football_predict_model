@@ -3,7 +3,7 @@ import os
 from sqlalchemy import text as sqlalchemy_text  # For clearing tables
 
 # Import functions from other modules
-from backend.features.config import ALL_PLAYERS_CSV_PATH, MATCH_RESULTS_CSV_PATH
+from backend.features.config import ALL_PLAYERS_CSV_PATH, PREPROCESSED_DATA_PATH
 from backend.features.utils import get_pg_engine
 from backend.features.db_setup import create_db_tables
 from backend.features.data_loader import load_squads_data, load_raw_matches_data
@@ -35,17 +35,17 @@ def main():
     # OPTIONAL: Clear tables if you want a fresh run for all data
     # Be careful with this on a production database!
     engine = get_pg_engine()
-    # clear_tables_for_rerun(engine, ['squads', 'matches_raw', 'matches_featured'])
+    clear_tables_for_rerun(engine, ['matches_featured'])
 
     # 2. Load Squads Data
-    print("\nStep 2: Loading squads data...")
-    squad_rows = load_squads_data(ALL_PLAYERS_CSV_PATH)
-    print(f"Finished loading squads. {squad_rows} rows processed into DB.")
+    # print("\nStep 2: Loading squads data...")
+    # squad_rows = load_squads_data(ALL_PLAYERS_CSV_PATH)
+    # print(f"Finished loading squads. {squad_rows} rows processed into DB.")
 
-    # 3. Load Raw Matches Data
-    print("\nStep 3: Loading raw matches data...")
-    raw_match_rows = load_raw_matches_data(MATCH_RESULTS_CSV_PATH)
-    print(f"Finished loading raw matches. {raw_match_rows} rows processed into DB.")
+    # # 3. Load Raw Matches Data
+    # print("\nStep 3: Loading raw matches data...")
+    # raw_match_rows = load_raw_matches_data(PREPROCESSED_DATA_PATH)
+    # print(f"Finished loading raw matches. {raw_match_rows} rows processed into DB.")
 
     # 4. Feature Engineering
     # (This reads from 'matches_raw' and writes to 'matches_featured')

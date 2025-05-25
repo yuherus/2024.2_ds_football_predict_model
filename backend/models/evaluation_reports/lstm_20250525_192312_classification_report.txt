@@ -1,0 +1,22 @@
+Model Type: LSTM
+League: premierleague
+Date: 2025-05-25 19:23:12
+
+SUMMARY METRICS
+===============
+Accuracy: 0.4844
+Weighted Precision: 0.4613
+Weighted Recall: 0.4844
+Weighted F1 Score: 0.4666
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.50      0.59      0.54       288
+        Draw       0.28      0.15      0.19       157
+    Home Win       0.52      0.57      0.54       290
+
+    accuracy                           0.48       735
+   macro avg       0.43      0.43      0.42       735
+weighted avg       0.46      0.48      0.47       735

@@ -1,0 +1,22 @@
+Model Type: LSTM
+League: ligue1
+Date: 2025-05-25 19:26:24
+
+SUMMARY METRICS
+===============
+Accuracy: 0.4092
+Weighted Precision: 0.3917
+Weighted Recall: 0.4092
+Weighted F1 Score: 0.3940
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.42      0.56      0.48       218
+        Draw       0.22      0.14      0.17       154
+    Home Win       0.49      0.46      0.47       217
+
+    accuracy                           0.41       589
+   macro avg       0.37      0.38      0.37       589
+weighted avg       0.39      0.41      0.39       589

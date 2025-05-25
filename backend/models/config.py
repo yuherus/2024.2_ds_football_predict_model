@@ -5,6 +5,7 @@ MODEL_SAVE_DIR = "backend/models/saved_models"
 XGBOOST_MODEL_FILENAME = "xgboost_football_predict.pkl"
 LSTM_MODEL_FILENAME = "lstm_football_predict.h5"
 SCALER_FILENAME = "feature_scaler.pkl"
+EVALUATION_REPORTS_DIR = "backend/models/evaluation_reports"
 
 # Cấu hình XGBoost
 XGBOOST_PARAMS = {

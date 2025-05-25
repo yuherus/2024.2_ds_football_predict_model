@@ -73,7 +73,9 @@ def engineer_features_for_season(season_df, engine):
     numeric_cols_to_check = [
         'home_score', 'away_score', 'round', 'home_possession', 'away_possession',
         'home_shots_on_target', 'away_shots_on_target', 'home_corners', 'away_corners',
-        'home_yellow_cards', 'home_red_cards', 'away_yellow_cards', 'away_red_cards'
+        'home_yellow_cards', 'home_red_cards', 'away_yellow_cards', 'away_red_cards',
+        'home_shots', 'away_shots', 'home_pass_completion', 'away_pass_completion',
+        'home_saves', 'away_saves', 'home_fouls', 'away_fouls'
     ]
     for col in numeric_cols_to_check:
         if col in season_df.columns:
@@ -323,6 +325,12 @@ def engineer_features_for_season(season_df, engine):
             featured_df[col] = pd.to_numeric(featured_df[col], errors='coerce').astype('Int64')
         else:
             featured_df[col] = pd.NA  # Add if missing, as Int64
+            
+    # Đảm bảo home_pass_completion, away_pass_completion, home_saves, away_saves là kiểu INTEGER
+    # int_cols = ['home_pass_completion', 'away_pass_completion', 'home_saves', 'away_saves']
+    # for col in int_cols:
+    #     if col in featured_df.columns:
+    #         featured_df[col] = pd.to_numeric(featured_df[col], errors='coerce').astype('Int64')
 
     # Ensure all columns expected by `matches_featured` table are present and in order
     final_df_cols = []
@@ -341,7 +349,7 @@ def engineer_features_for_season(season_df, engine):
             df_for_db[col] = featured_df[col]
         else:
             # Assign correct NA type based on config list for new features if not present
-            if col in FEATURED_INT_COLS:
+            if col in FEATURED_INT_COLS or col in int_cols:
                 df_for_db[col] = pd.NA
             elif col in FEATURED_FLOAT_COLS:
                 df_for_db[col] = np.nan
@@ -371,12 +379,36 @@ def process_all_seasons_and_store_features():
             print(f"  No matches found for season {season_val}. Skipping.")
             continue
 
+        # In ra giá trị của các cột quan trọng trước khi xử lý
+        print("\nGiá trị các cột trước khi xử lý:")
+        sample_df = season_df.head(3)
+        for idx, row in sample_df.iterrows():
+            print(f"Match {idx}: {row['home_team']} vs {row['away_team']}")
+            print(f"  home_shots: {row['home_shots']}, away_shots: {row['away_shots']}")
+            print(f"  home_pass_completion: {row['home_pass_completion']}, away_pass_completion: {row['away_pass_completion']}")
+            print(f"  home_red_cards: {row['home_red_cards']}, away_red_cards: {row['away_red_cards']}")
+
         featured_season_df = engineer_features_for_season(season_df.copy(), engine)  # Pass a copy
 
         if not featured_season_df.empty:
+            # In ra giá trị của các cột quan trọng sau khi xử lý
+            print("\nGiá trị các cột sau khi xử lý:")
+            sample_featured_df = featured_season_df.head(3)
+            for idx, row in sample_featured_df.iterrows():
+                print(f"Match {idx}: {row['home_team']} vs {row['away_team']}")
+                print(f"  home_shots: {row['home_shots']}, away_shots: {row['away_shots']}")
+                print(f"  home_pass_completion: {row['home_pass_completion']}, away_pass_completion: {row['away_pass_completion']}")
+                print(f"  home_red_cards: {row['home_red_cards']}, away_red_cards: {row['away_red_cards']}")
+            
             try:
                 # Use MATCHES_FEATURED_COLUMN_ORDER from config to ensure correct columns/order
                 featured_season_df_to_db = featured_season_df[MATCHES_FEATURED_COLUMN_ORDER]
+
+                # Kiểm tra kiểu dữ liệu của các cột quan trọng
+                print("\nKiểu dữ liệu của các cột quan trọng:")
+                for col in ['home_shots', 'away_shots', 'home_pass_completion', 'away_pass_completion', 'home_red_cards', 'away_red_cards']:
+                    if col in featured_season_df_to_db.columns:
+                        print(f"{col}: {featured_season_df_to_db[col].dtype}")
 
                 featured_season_df_to_db.to_sql('matches_featured', engine, if_exists='append', index=False,
                                                 method='multi', chunksize=1000)

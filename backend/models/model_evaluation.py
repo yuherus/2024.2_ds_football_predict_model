@@ -1,15 +1,20 @@
 """Utilities for evaluating model performance"""
 
+import matplotlib
+# Sử dụng backend 'Agg' để tránh lỗi Tkinter
+matplotlib.use('Agg')
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report, roc_curve, auc,
     precision_recall_curve, average_precision_score
 )
-from backend.models.config import CLASS_LABELS, EVALUATION_METRICS
+from backend.models.config import CLASS_LABELS, EVALUATION_METRICS, EVALUATION_REPORTS_DIR
 
 def calculate_metrics(y_true, y_pred, y_pred_proba=None):
     """
@@ -270,7 +275,82 @@ def compare_models(model_results, save_path=None):
     # Also return the comparison DataFrame
     return comparison_df
 
-def evaluate_model_on_test_data(model, X_test, y_test, model_type='xgboost'):
+def save_classification_report(y_true, y_pred, model_type='xgboost', save_dir=None, league=None, season=None):
+    """
+    Lưu classification report vào file để tiện trích xuất cho báo cáo
+    
+    Parameters:
+    -----------
+    y_true : array-like
+        True labels
+    y_pred : array-like
+        Predicted labels
+    model_type : str, default='xgboost'
+        Type of model being evaluated ('xgboost' or 'lstm')
+    save_dir : str, optional
+        Thư mục để lưu báo cáo, mặc định sẽ dùng EVALUATION_REPORTS_DIR từ config
+    league : str, optional
+        Tên giải đấu (nếu có)
+    season : str, optional
+        Mùa giải (nếu có)
+        
+    Returns:
+    --------
+    str
+        Đường dẫn đến file báo cáo đã lưu
+    """
+    # Sử dụng đường dẫn từ config nếu không có đường dẫn được chỉ định
+    if save_dir is None:
+        save_dir = EVALUATION_REPORTS_DIR
+    
+    # Tạo thư mục nếu chưa tồn tại
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # Tạo tên file
+    if league and season:
+        filename = f"{model_type}_{league}_{season}_classification_report.txt"
+    else:
+        timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{model_type}_{timestamp}_classification_report.txt"
+    
+    file_path = os.path.join(save_dir, filename)
+    
+    # Tạo báo cáo
+    report = classification_report(y_true, y_pred, target_names=CLASS_LABELS)
+    
+    # Tạo thông tin bổ sung
+    accuracy = accuracy_score(y_true, y_pred)
+    weighted_precision = precision_score(y_true, y_pred, average='weighted')
+    weighted_recall = recall_score(y_true, y_pred, average='weighted')
+    weighted_f1 = f1_score(y_true, y_pred, average='weighted')
+    
+    # Tạo nội dung file
+    content = f"Model Type: {model_type.upper()}\n"
+    if league:
+        content += f"League: {league}\n"
+    if season:
+        content += f"Season: {season}\n"
+    content += f"Date: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+    
+    content += "SUMMARY METRICS\n"
+    content += "===============\n"
+    content += f"Accuracy: {accuracy:.4f}\n"
+    content += f"Weighted Precision: {weighted_precision:.4f}\n"
+    content += f"Weighted Recall: {weighted_recall:.4f}\n"
+    content += f"Weighted F1 Score: {weighted_f1:.4f}\n\n"
+    
+    content += "CLASSIFICATION REPORT\n"
+    content += "=====================\n"
+    content += report
+    
+    # Lưu vào file
+    with open(file_path, 'w') as f:
+        f.write(content)
+    
+    print(f"Classification report saved to {file_path}")
+    return file_path
+
+def evaluate_model_on_test_data(model, X_test, y_test, model_type='xgboost', league=None, season=None):
     """
     Evaluate a trained model on test data
     
@@ -284,6 +364,10 @@ def evaluate_model_on_test_data(model, X_test, y_test, model_type='xgboost'):
         Test labels
     model_type : str, default='xgboost'
         Type of model being evaluated ('xgboost' or 'lstm')
+    league : str, optional
+        Tên giải đấu (nếu có)
+    season : str, optional
+        Mùa giải (nếu có)
         
     Returns:
     --------
@@ -319,6 +403,10 @@ def evaluate_model_on_test_data(model, X_test, y_test, model_type='xgboost'):
     
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=CLASS_LABELS))
+    
+    # Lưu classification report vào file
+    report_path = save_classification_report(y_test, y_pred, model_type, league=league, season=season)
+    metrics['classification_report_path'] = report_path
     
     # Plot confusion matrix
     plot_confusion_matrix(metrics['confusion_matrix'])

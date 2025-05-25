@@ -11,6 +11,9 @@ from backend.models.model_evaluation import calculate_metrics, compare_models, p
 import pandas as pd
 import numpy as np
 import os
+import matplotlib
+# Sử dụng backend 'Agg' để tránh lỗi Tkinter
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 import time
@@ -36,6 +39,10 @@ def train_league_season_models(data, league, season, save_dir="models"):
         Results of model training
     """
     print(f"\n=== Training models for {league} {season} ===")
+    
+    # Kiểm tra xem có bắt buộc tìm kiếm lại tham số không
+    import sys
+    force_grid_search = "--force-grid-search" in sys.argv
     
     # Prepare directory for this league-season
     league_season_dir = os.path.join(save_dir, f"{league}_{season}")
@@ -71,14 +78,20 @@ def train_league_season_models(data, league, season, save_dir="models"):
     xgb_start_time = time.time()
     
     # Sử dụng GridSearchCV để tìm tham số tốt nhất
-    xgb_model = train_xgboost(X_train, y_train, X_val, y_val, use_grid_search=True)
+    xgb_model = train_xgboost(
+        X_train, y_train, X_val, y_val, 
+        use_grid_search=True,
+        league=league,
+        season=season,
+        force_grid_search=force_grid_search
+    )
     
     xgb_training_time = time.time() - xgb_start_time
     print(f"XGBoost training completed in {xgb_training_time:.2f} seconds")
     
     # Evaluate XGBoost
     print(f"\nEvaluating XGBoost for {league} {season}...")
-    xgb_metrics = evaluate_xgboost(xgb_model, X_test, y_test)
+    xgb_metrics = evaluate_xgboost(xgb_model, X_test, y_test, league=league, season=season)
     
     # Save XGBoost model and plots
     xgb_model_path = os.path.join(league_season_dir, "xgboost_model.pkl")
@@ -161,7 +174,7 @@ def train_league_season_models(data, league, season, save_dir="models"):
                 X_train_seq, y_train_seq,
                 X_val_seq, y_val_seq,
                 batch_size=64,
-                epochs=100
+                epochs=50
             )
             
             lstm_training_time = time.time() - lstm_start_time
@@ -169,7 +182,7 @@ def train_league_season_models(data, league, season, save_dir="models"):
             
             # Evaluate LSTM
             print(f"\nEvaluating LSTM for {league} {season}...")
-            lstm_metrics = evaluate_lstm(lstm_model, X_test_seq, y_test_seq)
+            lstm_metrics = evaluate_lstm(lstm_model, X_test_seq, y_test_seq, league=league, season=season)
             
             # Save LSTM model and plots
             lstm_model_path = os.path.join(league_season_dir, "lstm_model.h5")
@@ -449,6 +462,10 @@ def train_all_models(save_dir="models"):
     # Create directory for models if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
     
+    # Kiểm tra xem có bắt buộc tìm kiếm lại tham số không
+    import sys
+    force_grid_search = "--force-grid-search" in sys.argv
+    
     print("Loading data from database...")
     data = load_data_from_db()
     
@@ -532,7 +549,9 @@ def train_all_models(save_dir="models"):
         xgb_model = train_xgboost(
             split_data['X_train'], split_data['y_train'],
             split_data['X_val'], split_data['y_val'],
-            use_grid_search=True
+            use_grid_search=True,
+            league=league,
+            force_grid_search=force_grid_search
         )
         
         xgb_training_time = time.time() - xgb_start_time
@@ -540,7 +559,7 @@ def train_all_models(save_dir="models"):
         
         # Evaluate XGBoost
         print(f"\nEvaluating XGBoost model for {league}...")
-        xgb_metrics = evaluate_xgboost(xgb_model, split_data['X_test'], split_data['y_test'])
+        xgb_metrics = evaluate_xgboost(xgb_model, split_data['X_test'], split_data['y_test'], league=league)
         
         # Save XGBoost model and plots
         xgb_model_path = os.path.join(league_dir, "xgboost_model.pkl")
@@ -621,7 +640,7 @@ def train_all_models(save_dir="models"):
                     X_train_seq, y_train_seq,
                     X_val_seq, y_val_seq,
                     batch_size=64,
-                    epochs=100
+                    epochs=50
                 )
                 
                 lstm_training_time = time.time() - lstm_start_time
@@ -629,7 +648,7 @@ def train_all_models(save_dir="models"):
                 
                 # Evaluate LSTM
                 print(f"\nEvaluating LSTM model for {league}...")
-                lstm_metrics = evaluate_lstm(lstm_model, X_test_seq, y_test_seq)
+                lstm_metrics = evaluate_lstm(lstm_model, X_test_seq, y_test_seq, league=league)
                 
                 # Save LSTM model and plots
                 lstm_model_path = os.path.join(league_dir, "lstm_model.h5")

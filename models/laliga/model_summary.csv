@@ -1,0 +1,2 @@
+League,Method,Train_size,Val_size,Test_size,XGBoost_Accuracy,XGBoost_F1,LSTM_Accuracy,LSTM_F1,Better_Model
+laliga,time-based,2587,740,370,0.5324324324324324,,0.4567567706108093,,XGBoost

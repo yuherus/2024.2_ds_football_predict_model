@@ -88,8 +88,8 @@ def load_raw_matches_data(csv_path):
     numeric_cols_int = ['home_score', 'away_score', 'round', 'home_possession', 'away_possession',
                         'home_shots', 'away_shots', 'home_shots_on_target', 'away_shots_on_target',
                         'home_red_cards', 'away_red_cards', 'home_yellow_cards', 'away_yellow_cards',
-                        'home_fouls', 'away_fouls', 'home_corners', 'away_corners']
-    numeric_cols_real = RAW_MATCH_NUMERIC_COLS_DERIVED  # these were made real by preprocess_percentage
+                        'home_fouls', 'away_fouls', 'home_corners', 'away_corners',
+                        'home_pass_completion', 'away_pass_completion', 'home_saves', 'away_saves']
 
     for chunk_num, chunk in enumerate(pd.read_csv(csv_path, chunksize=CHUNK_SIZE, low_memory=False, na_filter=False)):
         print(f"  Processing raw match chunk {chunk_num + 1}...")
@@ -110,34 +110,12 @@ def load_raw_matches_data(csv_path):
         else:
             chunk['match_date'] = None
 
-            # Create numeric from text for percentages
-        for col_suffix in ['pass_completion', 'saves']:
-            for team_type in ['home', 'away']:
-                # Input col name from CSV e.g., 'home_pass_completion' becomes 'home_pass_completion_text'
-                csv_col_name = f'{team_type}_{col_suffix}'
-                text_col_db_name = f'{team_type}_{col_suffix}_text'
-                numeric_col_db_name = f'{team_type}_{col_suffix}'  # This is the target numeric column
-
-                if csv_col_name in chunk.columns:  # if CSV has 'home_pass_completion'
-                    chunk.rename(columns={csv_col_name: text_col_db_name}, inplace=True)
-                    chunk[numeric_col_db_name] = chunk[text_col_db_name].apply(preprocess_percentage)
-                elif text_col_db_name in chunk.columns:  # if CSV already had '_text'
-                    chunk[numeric_col_db_name] = chunk[text_col_db_name].apply(preprocess_percentage)
-                else:  # Column missing entirely
-                    chunk[text_col_db_name] = None
-                    chunk[numeric_col_db_name] = None
-
-        # Coerce types for other numeric columns
+        # Coerce types for numeric columns
         for col in numeric_cols_int:
             if col in chunk.columns:
                 chunk[col] = pd.to_numeric(chunk[col], errors='coerce').astype('Int64')
             else:
                 chunk[col] = pd.NA
-        for col in numeric_cols_real:  # these are derived cols like home_pass_completion
-            if col in chunk.columns:
-                chunk[col] = pd.to_numeric(chunk[col], errors='coerce').astype(float)
-            else:
-                chunk[col] = np.nan
 
         # Ensure all columns for matches_raw table are present
         current_cols = set(chunk.columns)
@@ -172,10 +150,10 @@ def load_raw_matches_data(csv_path):
 
 
 if __name__ == '__main__':
-    from backend.features.config import ALL_TEAMS_CSV_PATH, MATCH_RESULTS_CSV_PATH  # For standalone testing
+    from backend.features.config import ALL_PLAYERS_CSV_PATH, PREPROCESSED_DATA_PATH  # For standalone testing
 
     # Ensure dummy files exist or point to real files for testing this module
     print("Testing data_loader.py...")
-    # load_squads_data(ALL_TEAMS_CSV_PATH)
-    # load_raw_matches_data(MATCH_RESULTS_CSV_PATH)
+    load_squads_data(ALL_PLAYERS_CSV_PATH)
+    load_raw_matches_data(PREPROCESSED_DATA_PATH)
     print("Data loader testing complete.")

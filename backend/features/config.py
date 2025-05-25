@@ -16,6 +16,7 @@ DB_URI = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['
 # IMPORTANT: Replace with paths to your actual CSV files!
 ALL_PLAYERS_CSV_PATH = 'backend/data/all_player_values.csv'
 MATCH_RESULTS_CSV_PATH = 'backend/data/match_results.csv'
+PREPROCESSED_DATA_PATH = 'backend/data/preprocessed_matches.csv'
 
 # --- Processing Constants ---
 CHUNK_SIZE = 10000  # For reading large CSVs
@@ -27,16 +28,13 @@ RAW_MATCH_COLS_FROM_CSV = [
     'source', 'match_report_url', 'round', 'venue', 'home_lineup', 'away_lineup',
     'home_missing', 'away_missing', 'home_possession', 'away_possession', 'home_shots',
     'away_shots', 'home_shots_on_target', 'away_shots_on_target',
-    # These are text columns from CSV; numeric ones are derived
-    'home_pass_completion_text', 'away_pass_completion_text',
-    'home_saves_text', 'away_saves_text',
+    'home_pass_completion', 'away_pass_completion',
+    'home_saves', 'away_saves',
     'home_red_cards', 'away_red_cards', 'home_yellow_cards', 'away_yellow_cards',
     'home_fouls', 'away_fouls', 'home_corners', 'away_corners'
 ]
 # Derived numeric columns (created during raw data loading)
-RAW_MATCH_NUMERIC_COLS_DERIVED = [
-    'home_pass_completion', 'away_pass_completion', 'home_saves', 'away_saves'
-]
+RAW_MATCH_NUMERIC_COLS_DERIVED = []
 
 # Columns for the 'matches_featured' table (raw columns + engineered features)
 # This list helps ensure consistency when creating and inserting data
@@ -47,10 +45,9 @@ MATCHES_FEATURED_COLUMN_ORDER = [
     'home_lineup', 'away_lineup', 'home_missing', 'away_missing',
     'home_possession', 'away_possession', 'home_shots', 'away_shots',
     'home_shots_on_target', 'away_shots_on_target',
-    'home_pass_completion_text', 'away_pass_completion_text',
     'home_pass_completion', 'away_pass_completion',
+    'home_saves', 'away_saves',
     'home_red_cards', 'away_red_cards', 'home_yellow_cards', 'away_yellow_cards',
-    'home_saves_text', 'away_saves_text', 'home_saves', 'away_saves',
     'home_fouls', 'away_fouls', 'home_corners', 'away_corners', # End of raw match cols
     'home_points_last_5', 'away_points_last_5', 'home_standing', 'away_standing',
     'standing_diff', 'home_points', 'away_points', 'points_diff',

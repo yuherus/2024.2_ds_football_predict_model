@@ -44,13 +44,26 @@ def main():
     if not run_module("backend.features.add_squad_value_features"):
         print("Warning: Failed to run squad value feature module. Skipping this step.")
     
-    # Step 2: Train models
-    log_step("Step 2: Training prediction models with enhanced architecture")
+    # Bước mới: Tiền xử lý nâng cao
+    log_step("Step 2: Running enhanced preprocessing")
+    print("\nEnhanced Preprocessing:")
+    print("- Điền các round còn thiếu dựa trên nội suy từ ngày tháng")
+    print("- Điền các thông số trận đấu bằng trung vị của đội bóng trong mùa")
+    print("- Xử lý outliers bằng phương pháp IQR")
+    print("- Chuẩn hóa dữ liệu với RobustScaler")
+    
+    if not run_module("backend.features.enhanced_preprocessing"):
+        print("Warning: Failed to run enhanced preprocessing module. Skipping this step.")
+    
+    # Step 3: Train models (was Step 2 before)
+    log_step("Step 3: Training prediction models with enhanced architecture")
     print("\nXGBoost Model:")
     print("- Sử dụng GridSearchCV để tìm tham số tối ưu")
-    print("- Tối ưu các tham số: learning_rate, max_depth, min_child_weight, subsample, colsample_bytree, gamma, n_estimators")
+    print("- Tối ưu các tham số: learning_rate, max_depth, min_child_weight, subsample, colsample_bytree")
     print("- Tự động điều chỉnh scale_pos_weight dựa trên phân phối lớp")
     print("- Tạo biểu đồ phân tích ảnh hưởng của các tham số")
+    print("- Lưu tham số tốt nhất vào file JSON để tái sử dụng")
+    print("- Tự động tải tham số đã lưu để tiết kiệm thời gian")
     
     print("\nLSTM Model:")
     print("- Bidirectional LSTM layers")
@@ -60,6 +73,11 @@ def main():
     print("- Class weight balancing")
     print("- Learning rate scheduling")
     print("- Enhanced feature extraction")
+    
+    # Thêm tham số dòng lệnh để bắt buộc tìm kiếm lại tham số
+    force_grid_search = "--force-grid-search" in sys.argv
+    if force_grid_search:
+        print("\nChú ý: Đã kích hoạt tìm kiếm lại tham số (--force-grid-search)")
     
     if not run_module("backend.models.model_training"):
         print("Error: Failed to run model training module. Pipeline failed.")
@@ -72,7 +90,11 @@ def main():
     
     log_step(f"Pipeline completed successfully in {int(hours)}h {int(minutes)}m {int(seconds)}s")
     print("\nResults can be found in the 'models' directory.")
+    print("Preprocessed data can be found in 'backend/data/preprocessed_matches.csv'")
     print("XGBoost Grid Search results can be found in 'models/grid_search_results'.")
+    print("XGBoost Best Parameters can be found in 'models/grid_search_results/best_params'.")
+    print("\nĐể chạy lại tìm kiếm tham số, sử dụng tham số --force-grid-search:")
+    print("python -m backend.run_training_pipeline --force-grid-search")
 
 if __name__ == "__main__":
     main() 
