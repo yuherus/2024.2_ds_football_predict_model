@@ -106,16 +106,18 @@ def crawl_match_details(driver, url):
                                             
                                     elif "saves" in current_stat:
                                         try:
-                                            # Parse home saves
+                                            # Parse home saves (e.g., "4 of 5 — 80%")
                                             home_text = tds[0].find_element(By.CSS_SELECTOR, "div div").text
-                                            home_parts = home_text.split(" of ")
-                                            details["home_saves"] = home_parts[0].strip()
-                                            
-                                            # Parse away saves
+                                            if "of" in home_text:
+                                                home_parts = home_text.split(" of ")
+                                                details["home_saves"] = home_parts[0].strip()
+
+                                            # Parse away saves (e.g., "80% — 4 of 5")
                                             away_text = tds[1].find_element(By.CSS_SELECTOR, "div div").text
-                                            away_parts = away_text.split(" of ")
-                                            details["away_saves"] = away_parts[0].strip()
-                                            
+                                            if "—" in away_text and "of" in away_text:
+                                                right_part = away_text.split("—")[1].strip()
+                                                if "of" in right_part:
+                                                    details["away_saves"] = right_part.split("of")[0].strip()
                                         except Exception as e:
                                             print(f"Error processing saves data: {e}")
                                 except Exception as e:
@@ -281,7 +283,7 @@ def get_match_list(driver, main_url, league_name, season):
     return matches
 
 def crawl_fbref_match_results(league_name, league_id, league_slug, season):
-    print(f"\n🟢 Crawling {league_name} - {season}-{season+1}...")
+    print(f"\nCrawling {league_name} - {season}-{season+1}...")
     driver = setup_driver()
     results = []
 
@@ -313,17 +315,13 @@ def crawl_fbref_match_results(league_name, league_id, league_slug, season):
 # Danh sách các giải đấu
 leagues = [
     {"name": "Premier League", "id": 9, "slug": "Premier-League"},
-    {"name": "La Liga", "id": 12, "slug": "La-Liga"},
-    {"name": "Serie A", "id": 11, "slug": "Serie-A"},
-    {"name": "Bundesliga", "id": 20, "slug": "Bundesliga"},
-    {"name": "Ligue 1", "id": 13, "slug": "Ligue-1"},
 ]
 
 all_matches = []
 
 # Vòng lặp qua các mùa và giải
 for league in leagues:
-    for season in range(2014, 2015):  # Từ mùa 2014–2015 đến 2023–2024
+    for season in range(2014, 2024):  # Từ mùa 2014–2015 đến 2023–2024
         matches = crawl_fbref_match_results(
             league_name=league["name"],
             league_id=league["id"],
@@ -336,4 +334,4 @@ for league in leagues:
 # Lưu dữ liệu ra CSV
 df = pd.DataFrame(all_matches)
 df.to_csv("match_results_fbref_detailed.csv", index=False)
-print(f"\n✅ Đã lưu {len(df)} trận đấu vào match_results_fbref_detailed.csv")
+print(f"\nĐã lưu {len(df)} trận đấu vào match_results_fbref_detailed.csv")
