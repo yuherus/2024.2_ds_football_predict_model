@@ -1,0 +1,22 @@
+Model Type: LSTM
+League: seriea
+Date: 2025-05-28 01:15:06
+
+SUMMARY METRICS
+===============
+Accuracy: 0.4446
+Weighted Precision: 0.4192
+Weighted Recall: 0.4446
+Weighted F1 Score: 0.4121
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.43      0.62      0.51       260
+        Draw       0.31      0.11      0.17       220
+    Home Win       0.50      0.55      0.52       260
+
+    accuracy                           0.44       740
+   macro avg       0.41      0.43      0.40       740
+weighted avg       0.42      0.44      0.41       740

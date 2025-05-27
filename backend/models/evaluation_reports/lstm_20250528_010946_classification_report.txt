@@ -1,0 +1,22 @@
+Model Type: LSTM
+League: bundesliga
+Date: 2025-05-28 01:09:46
+
+SUMMARY METRICS
+===============
+Accuracy: 0.4085
+Weighted Precision: 0.4184
+Weighted Recall: 0.4085
+Weighted F1 Score: 0.4123
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.41      0.45      0.43       215
+        Draw       0.22      0.23      0.23       159
+    Home Win       0.57      0.50      0.53       216
+
+    accuracy                           0.41       590
+   macro avg       0.40      0.39      0.40       590
+weighted avg       0.42      0.41      0.41       590

@@ -1,2 +1,2 @@
 League,Method,Train_size,Val_size,Test_size,XGBoost_Accuracy,XGBoost_F1,LSTM_Accuracy,LSTM_F1,Better_Model
-bundesliga,time-based,2086,596,297,0.5454545454545454,,0.4779660999774933,,XGBoost
+bundesliga,time-based,2086,596,297,0.5454545454545454,,0.40847456455230713,,XGBoost

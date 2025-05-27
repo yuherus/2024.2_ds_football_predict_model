@@ -1,0 +1,22 @@
+Model Type: XGBOOST
+League: ligue1
+Date: 2025-05-28 00:01:49
+
+SUMMARY METRICS
+===============
+Accuracy: 0.5051
+Weighted Precision: 0.4514
+Weighted Recall: 0.5051
+Weighted F1 Score: 0.4418
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.52      0.51      0.52       103
+        Draw       0.27      0.04      0.07        78
+    Home Win       0.51      0.81      0.63       116
+
+    accuracy                           0.51       297
+   macro avg       0.43      0.45      0.40       297
+weighted avg       0.45      0.51      0.44       297

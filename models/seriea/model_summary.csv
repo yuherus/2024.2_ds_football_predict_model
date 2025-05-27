@@ -1,2 +1,2 @@
 League,Method,Train_size,Val_size,Test_size,XGBoost_Accuracy,XGBoost_F1,LSTM_Accuracy,LSTM_F1,Better_Model
-seriea,time-based,2585,741,370,0.5297297297297298,,0.454054057598114,,XGBoost
+seriea,time-based,2585,741,370,0.5297297297297298,,0.4445945918560028,,XGBoost

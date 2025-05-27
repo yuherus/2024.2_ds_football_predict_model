@@ -5,7 +5,7 @@ from backend.features.utils import get_pg_engine
 from tqdm import tqdm
 from collections import Counter
 
-def calculate_championship_probabilities(league, season, prediction_model, n_simulations=10):
+def calculate_championship_probabilities(league, season, prediction_model, n_simulations=100000):
     """
     Calculate championship probabilities using Monte Carlo simulation.
     

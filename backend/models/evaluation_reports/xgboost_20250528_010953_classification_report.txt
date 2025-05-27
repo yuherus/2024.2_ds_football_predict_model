@@ -1,0 +1,22 @@
+Model Type: XGBOOST
+League: laliga
+Date: 2025-05-28 01:09:53
+
+SUMMARY METRICS
+===============
+Accuracy: 0.5324
+Weighted Precision: 0.4180
+Weighted Recall: 0.5324
+Weighted F1 Score: 0.4503
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.55      0.53      0.54       101
+        Draw       0.09      0.01      0.02       104
+    Home Win       0.55      0.86      0.67       165
+
+    accuracy                           0.53       370
+   macro avg       0.39      0.47      0.41       370
+weighted avg       0.42      0.53      0.45       370

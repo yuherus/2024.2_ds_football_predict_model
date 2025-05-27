@@ -1,0 +1,22 @@
+Model Type: LSTM
+League: laliga
+Date: 2025-05-27 23:58:09
+
+SUMMARY METRICS
+===============
+Accuracy: 0.4568
+Weighted Precision: 0.4394
+Weighted Recall: 0.4568
+Weighted F1 Score: 0.4398
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.45      0.61      0.52       266
+        Draw       0.29      0.17      0.22       208
+    Home Win       0.54      0.53      0.54       266
+
+    accuracy                           0.46       740
+   macro avg       0.43      0.44      0.42       740
+weighted avg       0.44      0.46      0.44       740

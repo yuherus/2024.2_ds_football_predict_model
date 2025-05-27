@@ -60,7 +60,7 @@ def run_championship_calculation(leagues, seasons):
 
 if __name__ == "__main__":
     # Example usage with correct league names from database
-    leagues = ["premierleague", "bundesliga", "seriea"]  # Add other leagues as they appear in the database
+    leagues = ["premierleague", "bundesliga", "seriea", "ligue1", "laliga"]  # Add other leagues as they appear in the database
     seasons = ["2023-2024"]  # Match the season format in the database
     
     run_championship_calculation(leagues, seasons) 

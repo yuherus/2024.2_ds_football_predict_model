@@ -1,0 +1,22 @@
+Model Type: XGBOOST
+League: bundesliga
+Date: 2025-05-28 01:08:14
+
+SUMMARY METRICS
+===============
+Accuracy: 0.5455
+Weighted Precision: 0.3986
+Weighted Recall: 0.5455
+Weighted F1 Score: 0.4596
+
+CLASSIFICATION REPORT
+=====================
+              precision    recall  f1-score   support
+
+    Away Win       0.55      0.66      0.60        89
+        Draw       0.00      0.00      0.00        80
+    Home Win       0.54      0.80      0.65       128
+
+    accuracy                           0.55       297
+   macro avg       0.36      0.49      0.42       297
+weighted avg       0.40      0.55      0.46       297
